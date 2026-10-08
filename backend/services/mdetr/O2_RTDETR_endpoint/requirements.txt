@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.6
+torch==2.4.0
+numpy
+Pillow
+opencv-python-headless>=4.8
+modal>=0.73
+openmim
+

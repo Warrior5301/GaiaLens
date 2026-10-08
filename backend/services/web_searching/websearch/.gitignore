@@ -1,0 +1,15 @@
+# Local credentials and configuration
+.env
+.env.*
+!.env.example
+credentials.json
+
+# Local Python environment and bytecode
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Generated pipeline output
+outputs/
+modal_pipeline_test_results/
