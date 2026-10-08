@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "description": "Reference to derived data artifacts stored externally to keep agent state lightweight.",
+  "properties": {
+    "artifact_id": {
+      "description": "Unique derived artifact identifier",
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "artifact_type": {
+      "description": "Class of artifact stored",
+      "enum": [
+        "image",
+        "crop",
+        "roi",
+        "detection_set",
+        "obb_set",
+        "segmentation_mask",
+        "polygon",
+        "measurement",
+        "spatial_relation",
+        "ocr_result",
+        "aligned_asset",
+        "fusion_feature",
+        "change_map"
+      ],
+      "title": "Artifact Type",
+      "type": "string"
+    },
+    "uri": {
+      "description": "Storage URI or relative artifact path",
+      "title": "Uri",
+      "type": "string"
+    },
+    "source_asset_ids": {
+      "description": "IDs of source assets that contributed to this artifact",
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Asset Ids",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Arbitrary artifact metadata properties",
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "artifact_id",
+    "artifact_type",
+    "uri"
+  ],
+  "title": "ArtifactRef",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/artifact_ref.schema.json",
+  "x-schema-version": "0.1.1"
+}

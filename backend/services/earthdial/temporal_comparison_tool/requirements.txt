@@ -1,0 +1,14 @@
+# Dependencies for EarthDial Temporal Comparison Tool & Service
+fastapi>=0.110.0
+uvicorn>=0.28.0
+python-multipart>=0.0.9
+pydantic>=2.5.0
+requests>=2.31.0
+pillow>=10.0.0
+torch>=2.1.0
+torchvision>=0.16.0
+transformers>=4.37.2
+timm>=0.9.12
+einops>=0.6.1
+huggingface_hub>=0.20.0
+accelerate>=0.28.0

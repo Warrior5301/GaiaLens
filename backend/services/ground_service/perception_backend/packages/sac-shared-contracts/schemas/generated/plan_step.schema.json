@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "description": "Single orchestrated tool invocation step within an execution plan.",
+  "properties": {
+    "step_id": {
+      "description": "Unique step identifier (e.g. 'step_1')",
+      "title": "Step Id",
+      "type": "string"
+    },
+    "tool_name": {
+      "description": "Canonical identifier of tool to invoke",
+      "title": "Tool Name",
+      "type": "string"
+    },
+    "arguments": {
+      "additionalProperties": true,
+      "description": "Input parameters passed to the tool contract",
+      "title": "Arguments",
+      "type": "object"
+    },
+    "depends_on": {
+      "description": "List of step IDs that must complete before this step runs",
+      "items": {
+        "type": "string"
+      },
+      "title": "Depends On",
+      "type": "array"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable rationale for this execution step",
+      "title": "Description"
+    }
+  },
+  "required": [
+    "step_id",
+    "tool_name"
+  ],
+  "title": "PlanStep",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/plan_step.schema.json",
+  "x-schema-version": "0.1.1"
+}

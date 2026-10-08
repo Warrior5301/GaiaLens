@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "PlanStep": {
+      "additionalProperties": false,
+      "description": "Single orchestrated tool invocation step within an execution plan.",
+      "properties": {
+        "step_id": {
+          "description": "Unique step identifier (e.g. 'step_1')",
+          "title": "Step Id",
+          "type": "string"
+        },
+        "tool_name": {
+          "description": "Canonical identifier of tool to invoke",
+          "title": "Tool Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": true,
+          "description": "Input parameters passed to the tool contract",
+          "title": "Arguments",
+          "type": "object"
+        },
+        "depends_on": {
+          "description": "List of step IDs that must complete before this step runs",
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "type": "array"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable rationale for this execution step",
+          "title": "Description"
+        }
+      },
+      "required": [
+        "step_id",
+        "tool_name"
+      ],
+      "title": "PlanStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Decomposed multi-step execution plan produced by the planner.",
+  "properties": {
+    "request_id": {
+      "description": "Original user request identifier",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "steps": {
+      "description": "Ordered or dependency-directed steps to execute",
+      "items": {
+        "$ref": "#/$defs/PlanStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "reasoning": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "High-level plan decomposition rationale",
+      "title": "Reasoning"
+    }
+  },
+  "required": [
+    "request_id"
+  ],
+  "title": "AgentPlan",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/agent_plan.schema.json",
+  "x-schema-version": "0.1.1"
+}

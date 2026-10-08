@@ -1,0 +1,93 @@
+# SAC GeoAI Perception System - Model Runtime Configuration
+# Decoupled hosting-agnostic configuration for model providers, endpoints, and timeouts
+
+default_provider: local
+
+models:
+  remote_sam_sam3_v2:
+    model_id: remote_sam_sam3_v2
+    tool_name: segmentation_grounding
+    provider: local
+    backend_class: SegEarthOV3Backend
+    checkpoint: weights/segearth_ov3/segearth_ov3.pt
+    device: auto
+    dtype: bfloat16
+    real_model: true
+    endpoints:
+      load: http://localhost:8000/load
+      run: http://localhost:8000/run
+      unload: http://localhost:8000/unload
+      health: http://localhost:8000/health
+    modal_config:
+      app_name: sac-geoai-perception
+      function_name: api
+      web_endpoint: https://me240003014--sac-geoai-perception-api.modal.run/segmentation_grounding
+    startup_test:
+      enabled: true
+      image: test_assets/default_satellite.png
+      query: "Locate the swimming pool."
+    timeouts:
+      load_timeout_sec: 120.0
+      run_timeout_sec: 60.0
+      unload_timeout_sec: 30.0
+      max_retries: 2
+
+  yolo_obb_v1:
+    model_id: yolo_obb_v1
+    tool_name: object_detector
+    provider: local
+    backend_class: RotatedYOLOMSBackend
+    checkpoint: weights/dota/yolov8n-obb.pt
+    device: auto
+    dtype: fp16
+    real_model: true
+    endpoints:
+      load: http://localhost:8000/load
+      run: http://localhost:8000/run
+      unload: http://localhost:8000/unload
+      health: http://localhost:8000/health
+    modal_config:
+      app_name: sac-geoai-perception
+      function_name: api
+      web_endpoint: https://me240003014--sac-geoai-perception-api.modal.run/object_detector
+    startup_test:
+      enabled: true
+      image: test_assets/default_satellite.png
+      query: "tennis-court"
+      target_classes:
+        - "tennis-court"
+        - "swimming-pool"
+        - "ship"
+    timeouts:
+      load_timeout_sec: 60.0
+      run_timeout_sec: 30.0
+      unload_timeout_sec: 15.0
+      max_retries: 2
+
+  earthmind_v1:
+    model_id: earthmind_v1
+    tool_name: image_analyzer
+    provider: local
+    backend_class: ImageAnalyzerModelInterface
+    checkpoint: models/checkpoints/earthmind_v1.pt
+    device: auto
+    dtype: fp16
+    real_model: true
+    endpoints:
+      load: http://localhost:8000/load
+      run: http://localhost:8000/run
+      unload: http://localhost:8000/unload
+      health: http://localhost:8000/health
+    modal_config:
+      app_name: sac-geoai-perception
+      function_name: api
+      web_endpoint: https://me240003014--sac-geoai-perception-api.modal.run/image_analyzer
+    startup_test:
+      enabled: true
+      image: test_assets/default_satellite.png
+      query: "What objects are visible in this satellite image?"
+    timeouts:
+      load_timeout_sec: 120.0
+      run_timeout_sec: 60.0
+      unload_timeout_sec: 30.0
+      max_retries: 2

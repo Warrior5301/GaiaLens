@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "Modality": {
+      "description": "Supported sensor modalities for input imagery.",
+      "enum": [
+        "optical",
+        "sar",
+        "infrared",
+        "thermal",
+        "multispectral",
+        "hyperspectral",
+        "panchromatic"
+      ],
+      "title": "Modality",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Reference to an input satellite/aerial imagery asset (does NOT store image tensors).",
+  "properties": {
+    "asset_id": {
+      "description": "Unique asset identifier",
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "uri": {
+      "description": "Storage URI or filesystem path to image asset",
+      "title": "Uri",
+      "type": "string"
+    },
+    "modality": {
+      "$ref": "#/$defs/Modality",
+      "default": "optical",
+      "description": "Sensor modality classification"
+    },
+    "width_px": {
+      "description": "Image width in pixels",
+      "exclusiveMinimum": 0,
+      "title": "Width Px",
+      "type": "integer"
+    },
+    "height_px": {
+      "description": "Image height in pixels",
+      "exclusiveMinimum": 0,
+      "title": "Height Px",
+      "type": "integer"
+    },
+    "gsd_m": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Ground Sample Distance in meters per pixel",
+      "title": "Gsd M"
+    },
+    "crs": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Coordinate Reference System (e.g. EPSG:4326, EPSG:3857)",
+      "title": "Crs"
+    },
+    "acquisition_time": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "ISO-8601 acquisition timestamp",
+      "title": "Acquisition Time"
+    },
+    "bands": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "List of spectral band identifiers (e.g. ['R', 'G', 'B', 'NIR'])",
+      "title": "Bands"
+    }
+  },
+  "required": [
+    "asset_id",
+    "uri",
+    "width_px",
+    "height_px"
+  ],
+  "title": "AssetRef",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/asset_ref.schema.json",
+  "x-schema-version": "0.1.1"
+}

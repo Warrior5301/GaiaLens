@@ -1,0 +1,12 @@
+# GaiaLens FastAPI app (backend/app). Python 3.10+
+# Run from the project root: uvicorn backend.app.app:app --host 0.0.0.0 --port <port>
+
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9      # file uploads in /chat and /ground
+requests>=2.31
+pillow>=10.1                 # ImageFont.load_default(size=...) needs 10.1+
+numpy>=1.26
+json5>=0.9
+qwen-agent>=0.0.34
+soundfile>=0.12              # imported by qwen-agent at startup but not declared in its dependencies

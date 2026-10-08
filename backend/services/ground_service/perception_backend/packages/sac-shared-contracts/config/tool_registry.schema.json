@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sac-geoai/sac-shared-contracts/schemas/config/tool_registry.schema.json",
+  "x-schema-version": "0.1.0",
+  "title": "ToolRegistrySchema",
+  "description": "Validation schema for SAC GeoAI Agent tool registry configurations",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Configuration schema version"
+    },
+    "tools": {
+      "type": "object",
+      "description": "Map of tool names to their registration configuration metadata",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "owner",
+          "category",
+          "capabilities",
+          "input_contract",
+          "output_contract"
+        ],
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "Owning team or workstream identifier (e.g. team_a_perception, team_b_geo, team_c_roi_multimodal)"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["perception", "geo_spatial", "roi", "multimodal", "ocr", "reasoning"],
+            "description": "Functional domain category"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of functional capabilities provided by the tool"
+          },
+          "input_contract": {
+            "type": "string",
+            "description": "Pydantic contract class name for tool input"
+          },
+          "output_contract": {
+            "type": "string",
+            "description": "Pydantic contract class name for tool output"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable tool functionality description"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "tools"],
+  "additionalProperties": false
+}

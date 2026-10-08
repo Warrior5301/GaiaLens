@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "description": "Canonical Oriented Bounding Box representation.",
+  "properties": {
+    "cx": {
+      "description": "Center X pixel coordinate",
+      "title": "Cx",
+      "type": "number"
+    },
+    "cy": {
+      "description": "Center Y pixel coordinate",
+      "title": "Cy",
+      "type": "number"
+    },
+    "width": {
+      "description": "Width along major box axis",
+      "minimum": 0.0,
+      "title": "Width",
+      "type": "number"
+    },
+    "height": {
+      "description": "Height along minor box axis",
+      "minimum": 0.0,
+      "title": "Height",
+      "type": "number"
+    },
+    "angle_deg": {
+      "description": "Rotation angle in degrees",
+      "title": "Angle Deg",
+      "type": "number"
+    },
+    "angle_convention": {
+      "default": "ccw_from_image_x",
+      "description": "Canonical angle convention: Counter-Clockwise from image positive X-axis",
+      "title": "Angle Convention",
+      "type": "string"
+    }
+  },
+  "required": [
+    "cx",
+    "cy",
+    "width",
+    "height",
+    "angle_deg"
+  ],
+  "title": "OBB",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/obb.schema.json",
+  "x-schema-version": "0.1.1"
+}

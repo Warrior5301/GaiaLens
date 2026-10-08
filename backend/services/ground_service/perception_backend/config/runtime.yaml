@@ -1,0 +1,14 @@
+runtime:
+  device: "auto"
+  precision: "fp16"
+  timeout_seconds: 60
+  max_tool_calls_per_turn: 5
+  max_replans: 2
+  tiling:
+    tile_size_px: 512
+    overlap_px: 64
+  artifact_storage:
+    root_dir: "artifacts"
+  logging:
+    level: "INFO"
+    format: "json"

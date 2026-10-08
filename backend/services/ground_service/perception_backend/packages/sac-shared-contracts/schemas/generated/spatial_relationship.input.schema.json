@@ -1,0 +1,364 @@
+{
+  "$defs": {
+    "AssetRef": {
+      "additionalProperties": false,
+      "description": "Reference to an input satellite/aerial imagery asset (does NOT store image tensors).",
+      "properties": {
+        "asset_id": {
+          "description": "Unique asset identifier",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "uri": {
+          "description": "Storage URI or filesystem path to image asset",
+          "title": "Uri",
+          "type": "string"
+        },
+        "modality": {
+          "$ref": "#/$defs/Modality",
+          "default": "optical",
+          "description": "Sensor modality classification"
+        },
+        "width_px": {
+          "description": "Image width in pixels",
+          "exclusiveMinimum": 0,
+          "title": "Width Px",
+          "type": "integer"
+        },
+        "height_px": {
+          "description": "Image height in pixels",
+          "exclusiveMinimum": 0,
+          "title": "Height Px",
+          "type": "integer"
+        },
+        "gsd_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ground Sample Distance in meters per pixel",
+          "title": "Gsd M"
+        },
+        "crs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Coordinate Reference System (e.g. EPSG:4326, EPSG:3857)",
+          "title": "Crs"
+        },
+        "acquisition_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO-8601 acquisition timestamp",
+          "title": "Acquisition Time"
+        },
+        "bands": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of spectral band identifiers (e.g. ['R', 'G', 'B', 'NIR'])",
+          "title": "Bands"
+        }
+      },
+      "required": [
+        "asset_id",
+        "uri",
+        "width_px",
+        "height_px"
+      ],
+      "title": "AssetRef",
+      "type": "object"
+    },
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "GeoPoint": {
+      "additionalProperties": false,
+      "description": "Geographic coordinate representation.",
+      "properties": {
+        "latitude": {
+          "description": "Latitude in decimal degrees",
+          "maximum": 90.0,
+          "minimum": -90.0,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude in decimal degrees",
+          "maximum": 180.0,
+          "minimum": -180.0,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "altitude_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional altitude above sea level in meters",
+          "title": "Altitude M"
+        },
+        "crs": {
+          "default": "EPSG:4326",
+          "description": "Coordinate Reference System identifier",
+          "title": "Crs",
+          "type": "string"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "GeoPoint",
+      "type": "object"
+    },
+    "GeometryRef": {
+      "additionalProperties": false,
+      "description": "Discriminated spatial geometry reference with semantic validation.",
+      "properties": {
+        "geometry_type": {
+          "description": "Active discriminator type for geometry representation",
+          "enum": [
+            "bbox_px",
+            "polygon",
+            "point",
+            "artifact"
+          ],
+          "title": "Geometry Type",
+          "type": "string"
+        },
+        "bbox_px": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BBoxPx"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Axis-aligned bounding box"
+        },
+        "polygon": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Contour polygon coordinates [[x1, y1], [x2, y2], ...]",
+          "title": "Polygon"
+        },
+        "point": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PointPx"
+            },
+            {
+              "$ref": "#/$defs/GeoPoint"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "2D pixel point or geographic point",
+          "title": "Point"
+        },
+        "artifact_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Derived artifact identifier (e.g. mask or shapefile)",
+          "title": "Artifact Id"
+        }
+      },
+      "required": [
+        "geometry_type"
+      ],
+      "title": "GeometryRef",
+      "type": "object"
+    },
+    "Modality": {
+      "description": "Supported sensor modalities for input imagery.",
+      "enum": [
+        "optical",
+        "sar",
+        "infrared",
+        "thermal",
+        "multispectral",
+        "hyperspectral",
+        "panchromatic"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "PointPx": {
+      "additionalProperties": false,
+      "description": "2D point in canonical image pixel coordinates (origin: top-left, x: right, y: down).",
+      "properties": {
+        "x": {
+          "description": "Horizontal pixel coordinate (columns from left edge)",
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "description": "Vertical pixel coordinate (rows from top edge)",
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "PointPx",
+      "type": "object"
+    },
+    "SpatialRelationType": {
+      "description": "Topological, directional, and metric spatial relationship types.",
+      "enum": [
+        "contains",
+        "within",
+        "intersects",
+        "disjoint",
+        "adjacent_to",
+        "north_of",
+        "south_of",
+        "east_of",
+        "west_of",
+        "distance"
+      ],
+      "title": "SpatialRelationType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Input contract for Spatial_Relationship tool.",
+  "properties": {
+    "asset": {
+      "$ref": "#/$defs/AssetRef",
+      "description": "Reference asset"
+    },
+    "subject": {
+      "$ref": "#/$defs/GeometryRef",
+      "description": "Primary subject geometry"
+    },
+    "object_ref": {
+      "$ref": "#/$defs/GeometryRef",
+      "description": "Secondary reference geometry"
+    },
+    "relation_types": {
+      "description": "List of relationship hypotheses to evaluate",
+      "items": {
+        "$ref": "#/$defs/SpatialRelationType"
+      },
+      "title": "Relation Types",
+      "type": "array"
+    },
+    "distance_threshold_m": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional distance threshold for adjacency/proximity",
+      "title": "Distance Threshold M"
+    }
+  },
+  "required": [
+    "asset",
+    "subject",
+    "object_ref",
+    "relation_types"
+  ],
+  "title": "SpatialRelationshipInput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/spatial_relationship.input.schema.json",
+  "x-schema-version": "0.1.1"
+}

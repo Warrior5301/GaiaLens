@@ -1,0 +1,55 @@
+models:
+  qwen3_vl_8b:
+    task: "vision_language"
+    framework: "pytorch"
+    architecture: "Qwen3-VL"
+    weights:
+      uri: "Qwen/Qwen3-VL-8B-Instruct"
+    precision: "auto"
+    hyperparameters:
+      max_new_tokens: 1400
+      default_confidence: 0.5
+
+  earthmind_v1:
+    task: "captioning_vqa"
+    framework: "pytorch"
+    architecture: "EarthMind"
+    weights:
+      uri: "models/checkpoints/earthmind_v1.pt"
+    precision: "fp16"
+    hyperparameters:
+      max_new_tokens: 512
+      temperature: 0.2
+
+  yolo_vhr_v1:
+    task: "object_detection"
+    framework: "pytorch"
+    architecture: "YOLO-VHR"
+    weights:
+      uri: "weights/dota/yolov8n-obb.pt"
+    precision: "fp16"
+    hyperparameters:
+      confidence_threshold: 0.35
+      iou_threshold: 0.5
+
+  ship_obb_v1:
+    task: "obb_detection"
+    framework: "pytorch"
+    architecture: "YOLO-OBB"
+    weights:
+      uri: "weights/dota/yolov8n-obb.pt"
+    precision: "fp16"
+    hyperparameters:
+      confidence_threshold: 0.35
+      rotated_iou_threshold: 0.4
+
+  remote_sam_sam3_v2:
+    task: "segmentation_grounding"
+    framework: "pytorch"
+    architecture: "RemoteSAM-SAM3-v2"
+    weights:
+      uri: "weights/segearth_ov3/segearth_ov3.pt"
+    precision: "fp16"
+    hyperparameters:
+      dbscan_eps: 0.5
+      min_samples: 5

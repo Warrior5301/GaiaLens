@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "SpatialRelationType": {
+      "description": "Topological, directional, and metric spatial relationship types.",
+      "enum": [
+        "contains",
+        "within",
+        "intersects",
+        "disjoint",
+        "adjacent_to",
+        "north_of",
+        "south_of",
+        "east_of",
+        "west_of",
+        "distance"
+      ],
+      "title": "SpatialRelationType",
+      "type": "string"
+    },
+    "SpatialRelationship": {
+      "additionalProperties": false,
+      "description": "Evaluated spatial relationship between two geometries.",
+      "properties": {
+        "relation_type": {
+          "$ref": "#/$defs/SpatialRelationType",
+          "description": "Target spatial relation"
+        },
+        "satisfied": {
+          "description": "Whether the relation holds true between subject and object",
+          "title": "Satisfied",
+          "type": "boolean"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "description": "Confidence in relationship assessment"
+        },
+        "distance_m": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Metric distance between entities if applicable",
+          "title": "Distance M"
+        },
+        "details": {
+          "additionalProperties": true,
+          "description": "Diagnostic details",
+          "title": "Details",
+          "type": "object"
+        }
+      },
+      "required": [
+        "relation_type",
+        "satisfied",
+        "confidence"
+      ],
+      "title": "SpatialRelationship",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Output contract from Spatial_Relationship tool.",
+  "properties": {
+    "relationships": {
+      "description": "Evaluated outcomes for each requested relationship",
+      "items": {
+        "$ref": "#/$defs/SpatialRelationship"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "Calculation metadata",
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "relationships"
+  ],
+  "title": "SpatialRelationshipOutput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/spatial_relationship.output.schema.json",
+  "x-schema-version": "0.1.1"
+}

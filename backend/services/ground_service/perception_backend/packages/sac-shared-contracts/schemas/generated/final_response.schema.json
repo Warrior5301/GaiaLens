@@ -1,0 +1,99 @@
+{
+  "$defs": {
+    "Claim": {
+      "additionalProperties": false,
+      "description": "Atomic verifiable factual statement made in the final synthesized answer.",
+      "properties": {
+        "claim_id": {
+          "description": "Unique claim identifier (e.g. 'c1')",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "text": {
+          "description": "Textual representation of the claim",
+          "title": "Text",
+          "type": "string"
+        },
+        "claim_type": {
+          "description": "Type classification: count, existence, localization, measurement, spatial_relation, attribute",
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "value": {
+          "default": null,
+          "description": "Extracted numerical or categorical value for deterministic verification",
+          "title": "Value"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Unit of measurement if applicable (e.g. 'm2', 'km', 'pixels')",
+          "title": "Unit"
+        },
+        "supported_by": {
+          "description": "List of evidence IDs justifying this claim",
+          "items": {
+            "type": "string"
+          },
+          "title": "Supported By",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type"
+      ],
+      "title": "Claim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Structured final response payload with verifiable evidence links.",
+  "properties": {
+    "answer": {
+      "description": "Natural language response synthesized for the user",
+      "title": "Answer",
+      "type": "string"
+    },
+    "claims": {
+      "description": "Traceable atomic claims embedded in the answer",
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "confidence": {
+      "description": "Overall answer confidence based on supporting evidence",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "limitations": {
+      "description": "Explicit caveats, model uncertainties, or sensor assumptions",
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "answer",
+    "confidence"
+  ],
+  "title": "FinalResponse",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/final_response.schema.json",
+  "x-schema-version": "0.1.1"
+}

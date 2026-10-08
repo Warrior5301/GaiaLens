@@ -1,0 +1,252 @@
+{
+  "$defs": {
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "GeoPoint": {
+      "additionalProperties": false,
+      "description": "Geographic coordinate representation.",
+      "properties": {
+        "latitude": {
+          "description": "Latitude in decimal degrees",
+          "maximum": 90.0,
+          "minimum": -90.0,
+          "title": "Latitude",
+          "type": "number"
+        },
+        "longitude": {
+          "description": "Longitude in decimal degrees",
+          "maximum": 180.0,
+          "minimum": -180.0,
+          "title": "Longitude",
+          "type": "number"
+        },
+        "altitude_m": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional altitude above sea level in meters",
+          "title": "Altitude M"
+        },
+        "crs": {
+          "default": "EPSG:4326",
+          "description": "Coordinate Reference System identifier",
+          "title": "Crs",
+          "type": "string"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "title": "GeoPoint",
+      "type": "object"
+    },
+    "OBB": {
+      "additionalProperties": false,
+      "description": "Canonical Oriented Bounding Box representation.",
+      "properties": {
+        "cx": {
+          "description": "Center X pixel coordinate",
+          "title": "Cx",
+          "type": "number"
+        },
+        "cy": {
+          "description": "Center Y pixel coordinate",
+          "title": "Cy",
+          "type": "number"
+        },
+        "width": {
+          "description": "Width along major box axis",
+          "minimum": 0.0,
+          "title": "Width",
+          "type": "number"
+        },
+        "height": {
+          "description": "Height along minor box axis",
+          "minimum": 0.0,
+          "title": "Height",
+          "type": "number"
+        },
+        "angle_deg": {
+          "description": "Rotation angle in degrees",
+          "title": "Angle Deg",
+          "type": "number"
+        },
+        "angle_convention": {
+          "default": "ccw_from_image_x",
+          "description": "Canonical angle convention: Counter-Clockwise from image positive X-axis",
+          "title": "Angle Convention",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cx",
+        "cy",
+        "width",
+        "height",
+        "angle_deg"
+      ],
+      "title": "OBB",
+      "type": "object"
+    },
+    "PointPx": {
+      "additionalProperties": false,
+      "description": "2D point in canonical image pixel coordinates (origin: top-left, x: right, y: down).",
+      "properties": {
+        "x": {
+          "description": "Horizontal pixel coordinate (columns from left edge)",
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "description": "Vertical pixel coordinate (rows from top edge)",
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "PointPx",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical single object detection instance.",
+  "properties": {
+    "object_id": {
+      "description": "Unique object instance identifier",
+      "title": "Object Id",
+      "type": "string"
+    },
+    "class_name": {
+      "description": "Predicted semantic object class",
+      "title": "Class Name",
+      "type": "string"
+    },
+    "confidence": {
+      "$ref": "#/$defs/Confidence",
+      "description": "Detection confidence details"
+    },
+    "bbox_px": {
+      "$ref": "#/$defs/BBoxPx",
+      "description": "Axis-Aligned Bounding Box in pixel coordinates"
+    },
+    "obb": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/OBB"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Oriented Bounding Box if orientation was detected"
+    },
+    "center_px": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PointPx"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Centroid coordinate of detection in pixels"
+    },
+    "geolocation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GeoPoint"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Geographic coordinates if CRS and georeference are known"
+    }
+  },
+  "required": [
+    "object_id",
+    "class_name",
+    "confidence",
+    "bbox_px"
+  ],
+  "title": "Detection",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/detection.schema.json",
+  "x-schema-version": "0.1.1"
+}

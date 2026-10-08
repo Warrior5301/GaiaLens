@@ -1,0 +1,23 @@
+# Global contract owners
+* @SAC_CORE_TEAM
+
+# Common domain & tool protocol (Requires core lead approval)
+/src/sac_shared_contracts/common.py          @TEAM_LEAD
+/src/sac_shared_contracts/tool_protocol.py   @TEAM_LEAD
+/src/sac_shared_contracts/evidence.py        @TEAM_LEAD
+/src/sac_shared_contracts/agent.py           @TEAM_LEAD
+
+# Team A: Perception contracts
+/src/sac_shared_contracts/perception.py      @PERCEPTION_TEAM
+
+# Team B: Geo/Spatial contracts
+/src/sac_shared_contracts/geo_spatial.py     @GEO_SPATIAL_TEAM
+
+# Team C: ROI, Multimodal, and OCR contracts
+/src/sac_shared_contracts/roi.py             @MULTIMODAL_TEAM
+/src/sac_shared_contracts/multimodal.py      @MULTIMODAL_TEAM
+/src/sac_shared_contracts/ocr.py             @MULTIMODAL_TEAM
+
+# Schemas & CI
+/schemas/                                    @SAC_CORE_TEAM
+/.github/                                    @SAC_CORE_TEAM

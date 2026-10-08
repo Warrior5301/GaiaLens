@@ -1,0 +1,45 @@
+{
+  "additionalProperties": false,
+  "description": "Standardized tool invocation envelope submitted by the orchestrator/agent.",
+  "properties": {
+    "call_id": {
+      "description": "Unique invocation identifier",
+      "title": "Call Id",
+      "type": "string"
+    },
+    "tool_name": {
+      "description": "Canonical identifier of registered tool",
+      "title": "Tool Name",
+      "type": "string"
+    },
+    "tool_version": {
+      "default": "1.0.0",
+      "description": "Semantic version of target tool contract",
+      "title": "Tool Version",
+      "type": "string"
+    },
+    "arguments": {
+      "additionalProperties": true,
+      "description": "Input parameters passed to the tool",
+      "title": "Arguments",
+      "type": "object"
+    },
+    "depends_on": {
+      "description": "IDs of prerequisite tool calls that must complete first",
+      "items": {
+        "type": "string"
+      },
+      "title": "Depends On",
+      "type": "array"
+    }
+  },
+  "required": [
+    "call_id",
+    "tool_name"
+  ],
+  "title": "ToolCall",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/tool_call.schema.json",
+  "x-schema-version": "0.1.1"
+}

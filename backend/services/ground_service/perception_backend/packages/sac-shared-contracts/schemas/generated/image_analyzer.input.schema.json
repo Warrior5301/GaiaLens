@@ -1,0 +1,374 @@
+{
+  "$defs": {
+    "AssetRef": {
+      "additionalProperties": false,
+      "description": "Reference to an input satellite/aerial imagery asset (does NOT store image tensors).",
+      "properties": {
+        "asset_id": {
+          "description": "Unique asset identifier",
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "uri": {
+          "description": "Storage URI or filesystem path to image asset",
+          "title": "Uri",
+          "type": "string"
+        },
+        "modality": {
+          "$ref": "#/$defs/Modality",
+          "default": "optical",
+          "description": "Sensor modality classification"
+        },
+        "width_px": {
+          "description": "Image width in pixels",
+          "exclusiveMinimum": 0,
+          "title": "Width Px",
+          "type": "integer"
+        },
+        "height_px": {
+          "description": "Image height in pixels",
+          "exclusiveMinimum": 0,
+          "title": "Height Px",
+          "type": "integer"
+        },
+        "gsd_m": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Ground Sample Distance in meters per pixel",
+          "title": "Gsd M"
+        },
+        "crs": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Coordinate Reference System (e.g. EPSG:4326, EPSG:3857)",
+          "title": "Crs"
+        },
+        "acquisition_time": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "ISO-8601 acquisition timestamp",
+          "title": "Acquisition Time"
+        },
+        "bands": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "List of spectral band identifiers (e.g. ['R', 'G', 'B', 'NIR'])",
+          "title": "Bands"
+        }
+      },
+      "required": [
+        "asset_id",
+        "uri",
+        "width_px",
+        "height_px"
+      ],
+      "title": "AssetRef",
+      "type": "object"
+    },
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "CoordinateFrame": {
+      "description": "Coordinate reference frames supported across SAC GeoAI.",
+      "enum": [
+        "pixel",
+        "normalized",
+        "geographic",
+        "projected"
+      ],
+      "title": "CoordinateFrame",
+      "type": "string"
+    },
+    "GenerationConfig": {
+      "additionalProperties": false,
+      "description": "Text generation parameters for VLM reasoning.",
+      "properties": {
+        "max_new_tokens": {
+          "default": 512,
+          "description": "Maximum new token generation limit",
+          "exclusiveMinimum": 0,
+          "title": "Max New Tokens",
+          "type": "integer"
+        },
+        "temperature": {
+          "default": 0.2,
+          "description": "Sampling temperature",
+          "maximum": 2.0,
+          "minimum": 0.0,
+          "title": "Temperature",
+          "type": "number"
+        },
+        "do_sample": {
+          "default": false,
+          "description": "Whether to sample or use greedy decoding",
+          "title": "Do Sample",
+          "type": "boolean"
+        }
+      },
+      "title": "GenerationConfig",
+      "type": "object"
+    },
+    "Modality": {
+      "description": "Supported sensor modalities for input imagery.",
+      "enum": [
+        "optical",
+        "sar",
+        "infrared",
+        "thermal",
+        "multispectral",
+        "hyperspectral",
+        "panchromatic"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "PointPx": {
+      "additionalProperties": false,
+      "description": "2D point in canonical image pixel coordinates (origin: top-left, x: right, y: down).",
+      "properties": {
+        "x": {
+          "description": "Horizontal pixel coordinate (columns from left edge)",
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "description": "Vertical pixel coordinate (rows from top edge)",
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "PointPx",
+      "type": "object"
+    },
+    "ROI": {
+      "additionalProperties": false,
+      "description": "Canonical Region of Interest defining a focused spatial scope within an asset.",
+      "properties": {
+        "roi_id": {
+          "description": "Unique ROI identifier",
+          "title": "Roi Id",
+          "type": "string"
+        },
+        "source_asset_id": {
+          "description": "Originating asset ID",
+          "title": "Source Asset Id",
+          "type": "string"
+        },
+        "bbox_px": {
+          "$ref": "#/$defs/BBoxPx",
+          "description": "Axis-Aligned Bounding Box in canonical pixel frame"
+        },
+        "polygon": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/PointPx"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional finer polygon boundary of ROI",
+          "title": "Polygon"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Semantic rationale for ROI localization (e.g. prompt, prior detection)",
+          "title": "Reason"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Confidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Confidence in ROI localization accuracy"
+        },
+        "coordinate_frame": {
+          "$ref": "#/$defs/CoordinateFrame",
+          "default": "pixel",
+          "description": "Coordinate system convention (canonical: pixel)"
+        }
+      },
+      "required": [
+        "roi_id",
+        "source_asset_id",
+        "bbox_px"
+      ],
+      "title": "ROI",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Input contract for Image_Analyzer semantic VLM tool.",
+  "properties": {
+    "asset": {
+      "$ref": "#/$defs/AssetRef",
+      "description": "Target image asset reference"
+    },
+    "task_type": {
+      "description": "Task mode: caption, vqa, or scene_understanding",
+      "enum": [
+        "caption",
+        "vqa",
+        "scene_understanding"
+      ],
+      "title": "Task Type",
+      "type": "string"
+    },
+    "question": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Natural language question (mandatory for vqa task)",
+      "title": "Question"
+    },
+    "roi": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BBoxPx"
+        },
+        {
+          "$ref": "#/$defs/ROI"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional bounding box or ROI spatial sub-window",
+      "title": "Roi"
+    },
+    "generation": {
+      "$ref": "#/$defs/GenerationConfig",
+      "description": "Text generation parameters"
+    }
+  },
+  "required": [
+    "asset",
+    "task_type"
+  ],
+  "title": "ImageAnalyzerInput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/image_analyzer.input.schema.json",
+  "x-schema-version": "0.1.1"
+}

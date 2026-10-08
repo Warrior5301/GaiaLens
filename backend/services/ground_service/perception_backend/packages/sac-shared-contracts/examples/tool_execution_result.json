@@ -1,0 +1,46 @@
+{
+  "call_id": "call_obb_01",
+  "tool_name": "OBB_Detector",
+  "tool_version": "0.1.0",
+  "status": "success",
+  "data": {
+    "detections": [
+      {
+        "object_id": "det_plane_01",
+        "class_name": "transport_aircraft",
+        "confidence": {
+          "score": 0.94,
+          "calibrated": true,
+          "source": "obb_model_v1"
+        },
+        "bbox_px": {
+          "x_min": 150.0,
+          "y_min": 200.0,
+          "x_max": 250.0,
+          "y_max": 310.0
+        },
+        "obb": {
+          "cx": 200.0,
+          "cy": 255.0,
+          "width": 60.0,
+          "height": 110.0,
+          "angle_deg": 45.0
+        }
+      }
+    ]
+  },
+  "evidence_refs": [
+    {
+      "evidence_id": "ev_obb_9918",
+      "source_tool": "OBB_Detector",
+      "confidence": 0.94,
+      "uri": "s3://artifacts/evidence/ev_obb_9918.json"
+    }
+  ],
+  "warnings": [],
+  "errors": [],
+  "metrics": {
+    "latency_ms": 142.5,
+    "gpu_memory_used_mb": 1820
+  }
+}

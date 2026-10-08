@@ -1,0 +1,22 @@
+{
+  "asset": {
+    "asset_id": "sat_asset_2026_01",
+    "uri": "s3://earth-observation/optical/2026/img_01.tif",
+    "modality": "optical",
+    "width_px": 2048,
+    "height_px": 2048,
+    "gsd_m": 0.5,
+    "crs": "EPSG:3857",
+    "acquisition_time": "2026-06-15T10:30:00Z",
+    "bands": ["red", "green", "blue"]
+  },
+  "geometry": {
+    "geometry_type": "artifact",
+    "artifact_id": "mask_segmentation_storage_tank_01"
+  },
+  "measurement_types": [
+    "area",
+    "perimeter"
+  ],
+  "crs_override": null
+}

@@ -1,0 +1,29 @@
+routing:
+  caption:
+    preferred_tools:
+      - Image_Analyzer
+  binary_vqa:
+    preferred_tools:
+      - Image_Analyzer
+  semantic_vqa:
+    preferred_tools:
+      - Image_Analyzer
+  numeric_vqa:
+    preferred_tools:
+      - Object_Detector
+      - Image_Analyzer
+  grounding:
+    preferred_tools:
+      - ROI_Localizer
+      - Segmentation_Grounding
+      - OBB_Detector
+  region_localization:
+    preferred_tools:
+      - ROI_Localizer
+      - Segmentation_Grounding
+  ocr:
+    preferred_tools:
+      - OCR_Extractor
+  oriented_detection:
+    preferred_tools:
+      - OBB_Detector

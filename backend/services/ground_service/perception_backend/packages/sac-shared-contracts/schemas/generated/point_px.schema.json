@@ -1,0 +1,25 @@
+{
+  "additionalProperties": false,
+  "description": "2D point in canonical image pixel coordinates (origin: top-left, x: right, y: down).",
+  "properties": {
+    "x": {
+      "description": "Horizontal pixel coordinate (columns from left edge)",
+      "title": "X",
+      "type": "number"
+    },
+    "y": {
+      "description": "Vertical pixel coordinate (rows from top edge)",
+      "title": "Y",
+      "type": "number"
+    }
+  },
+  "required": [
+    "x",
+    "y"
+  ],
+  "title": "PointPx",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/point_px.schema.json",
+  "x-schema-version": "0.1.1"
+}

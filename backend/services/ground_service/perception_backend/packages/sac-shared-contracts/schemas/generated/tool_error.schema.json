@@ -1,0 +1,65 @@
+{
+  "$defs": {
+    "ToolErrorCode": {
+      "description": "Standardized machine-readable error codes across all SAC tools.",
+      "enum": [
+        "INVALID_INPUT",
+        "ASSET_NOT_FOUND",
+        "INVALID_ROI",
+        "UNSUPPORTED_MODALITY",
+        "CRS_MISMATCH",
+        "REGISTRATION_FAILED",
+        "MODEL_TIMEOUT",
+        "GPU_OOM",
+        "LOW_CONFIDENCE",
+        "NO_DETECTIONS",
+        "SCHEMA_VALIDATION_ERROR",
+        "TOOL_INTERNAL_ERROR"
+      ],
+      "title": "ToolErrorCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Structured error descriptor returned during tool failure.",
+  "properties": {
+    "code": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ToolErrorCode"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Standardized machine-readable error code",
+      "title": "Code"
+    },
+    "message": {
+      "description": "Human-readable explanation of error condition",
+      "title": "Message",
+      "type": "string"
+    },
+    "retryable": {
+      "default": false,
+      "description": "Whether transient condition permits an automatic retry",
+      "title": "Retryable",
+      "type": "boolean"
+    },
+    "details": {
+      "additionalProperties": true,
+      "description": "Diagnostic payload, stack traces, or validation details",
+      "title": "Details",
+      "type": "object"
+    }
+  },
+  "required": [
+    "code",
+    "message"
+  ],
+  "title": "ToolError",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/tool_error.schema.json",
+  "x-schema-version": "0.1.1"
+}

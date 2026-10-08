@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "description": "Reference pointer to a factual evidence record.",
+      "properties": {
+        "evidence_id": {
+          "description": "Unique evidence identifier",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "source_tool": {
+          "description": "Tool that produced this evidence item",
+          "title": "Source Tool",
+          "type": "string"
+        },
+        "confidence": {
+          "description": "Confidence associated with this evidence",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "uri": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional URI to underlying evidence payload",
+          "title": "Uri"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source_tool",
+        "confidence"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "ToolError": {
+      "additionalProperties": false,
+      "description": "Structured error descriptor returned during tool failure.",
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ToolErrorCode"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Standardized machine-readable error code",
+          "title": "Code"
+        },
+        "message": {
+          "description": "Human-readable explanation of error condition",
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "default": false,
+          "description": "Whether transient condition permits an automatic retry",
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "details": {
+          "additionalProperties": true,
+          "description": "Diagnostic payload, stack traces, or validation details",
+          "title": "Details",
+          "type": "object"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "ToolError",
+      "type": "object"
+    },
+    "ToolErrorCode": {
+      "description": "Standardized machine-readable error codes across all SAC tools.",
+      "enum": [
+        "INVALID_INPUT",
+        "ASSET_NOT_FOUND",
+        "INVALID_ROI",
+        "UNSUPPORTED_MODALITY",
+        "CRS_MISMATCH",
+        "REGISTRATION_FAILED",
+        "MODEL_TIMEOUT",
+        "GPU_OOM",
+        "LOW_CONFIDENCE",
+        "NO_DETECTIONS",
+        "SCHEMA_VALIDATION_ERROR",
+        "TOOL_INTERNAL_ERROR"
+      ],
+      "title": "ToolErrorCode",
+      "type": "string"
+    },
+    "ToolExecutionStatus": {
+      "description": "Lifecycle completion status of a tool invocation.",
+      "enum": [
+        "success",
+        "partial",
+        "failed"
+      ],
+      "title": "ToolExecutionStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Standardized tool response envelope returned by tool runtimes.",
+  "properties": {
+    "call_id": {
+      "description": "Invocation identifier corresponding to ToolCall",
+      "title": "Call Id",
+      "type": "string"
+    },
+    "tool_name": {
+      "description": "Name of executed tool",
+      "title": "Tool Name",
+      "type": "string"
+    },
+    "tool_version": {
+      "description": "Version of executed tool",
+      "title": "Tool Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ToolExecutionStatus",
+      "description": "Execution outcome status"
+    },
+    "data": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Serialized ToolOutput payload on success or partial success",
+      "title": "Data"
+    },
+    "evidence_refs": {
+      "description": "References to factual evidence generated during execution",
+      "items": {
+        "$ref": "#/$defs/EvidenceRef"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "warnings": {
+      "description": "Non-fatal warnings or caveats emitted during run",
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "description": "Structured error records if failures occurred",
+      "items": {
+        "$ref": "#/$defs/ToolError"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "metrics": {
+      "additionalProperties": true,
+      "description": "Execution performance metrics (e.g. latency_ms, tiles_processed)",
+      "title": "Metrics",
+      "type": "object"
+    }
+  },
+  "required": [
+    "call_id",
+    "tool_name",
+    "tool_version",
+    "status"
+  ],
+  "title": "ToolExecutionResult",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/tool_execution_result.schema.json",
+  "x-schema-version": "0.1.1"
+}

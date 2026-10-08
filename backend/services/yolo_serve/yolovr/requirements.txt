@@ -1,0 +1,4 @@
+# Local dependency for test_inference.py. Modal installs model dependencies
+# inside the container defined in modal_app.py.
+modal
+requests

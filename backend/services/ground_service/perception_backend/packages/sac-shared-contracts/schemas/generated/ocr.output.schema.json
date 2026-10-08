@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "OCRTextRegion": {
+      "additionalProperties": false,
+      "description": "Recognized textual transcription within a localized bounding box.",
+      "properties": {
+        "text_id": {
+          "description": "Unique text instance identifier",
+          "title": "Text Id",
+          "type": "string"
+        },
+        "text": {
+          "description": "Extracted textual transcription",
+          "title": "Text",
+          "type": "string"
+        },
+        "bbox_px": {
+          "$ref": "#/$defs/BBoxPx",
+          "description": "Bounding box of text region in canonical pixel coordinates"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "description": "Transcription confidence score"
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Detected or specified language code (e.g. 'en')",
+          "title": "Language"
+        },
+        "rotation_deg": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Text baseline orientation in degrees",
+          "title": "Rotation Deg"
+        }
+      },
+      "required": [
+        "text_id",
+        "text",
+        "bbox_px",
+        "confidence"
+      ],
+      "title": "OCRTextRegion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Output contract from OCR_Extractor tool.",
+  "properties": {
+    "regions": {
+      "description": "Localized textual detections",
+      "items": {
+        "$ref": "#/$defs/OCRTextRegion"
+      },
+      "title": "Regions",
+      "type": "array"
+    },
+    "full_text": {
+      "description": "Concatenated reading-order text",
+      "title": "Full Text",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "description": "OCR engine metadata",
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "full_text"
+  ],
+  "title": "OCROutput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/ocr.output.schema.json",
+  "x-schema-version": "0.1.1"
+}

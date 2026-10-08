@@ -1,0 +1,31 @@
+{
+  "asset": {
+    "asset_id": "asset_airsat_01",
+    "uri": "s3://imagery/airport_north.tif",
+    "modality": "optical",
+    "width_px": 4096,
+    "height_px": 4096,
+    "gsd_m": 0.3,
+    "crs": "EPSG:32643"
+  },
+  "target_classes": [
+    "airplane"
+  ],
+  "roi": {
+    "x_min": 1024.0,
+    "y_min": 1536.0,
+    "x_max": 2560.0,
+    "y_max": 3072.0
+  },
+  "confidence_threshold": 0.35,
+  "nms_config": {
+    "iou_threshold": 0.5,
+    "score_threshold": 0.25,
+    "max_detections": 150
+  },
+  "tiling_config": {
+    "enabled": true,
+    "tile_size_px": 512,
+    "overlap_px": 64
+  }
+}

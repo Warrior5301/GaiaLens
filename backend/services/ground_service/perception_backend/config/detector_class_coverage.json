@@ -1,0 +1,209 @@
+{
+  "dataset": "VRS-Bench",
+  "version": "1.0",
+  "generated_at": "2026-10-01T17:37:00Z",
+  "coverage_summary": {
+    "total_phrases_analyzed": 28,
+    "supported_count": 20,
+    "unsupported_count": 8,
+    "support_ratio": 0.714
+  },
+  "classes": [
+    {
+      "phrase": "airplane",
+      "normalized_class": "aircraft",
+      "detector_class": "airplane",
+      "detector_supported": true,
+      "notes": "Directly supported closed-set category. High precision on VHR imagery."
+    },
+    {
+      "phrase": "commercial airplanes",
+      "normalized_class": "aircraft",
+      "detector_class": "airplane",
+      "detector_supported": true,
+      "notes": "Mapped via semantic normalization to airplane."
+    },
+    {
+      "phrase": "airplanes parked near terminal",
+      "normalized_class": "aircraft",
+      "detector_class": "airplane",
+      "detector_supported": true,
+      "notes": "Supported after spatial or ROI localization."
+    },
+    {
+      "phrase": "cargo aircraft",
+      "normalized_class": "aircraft",
+      "detector_class": "airplane",
+      "detector_supported": true,
+      "notes": "Normalized to aircraft -> airplane."
+    },
+    {
+      "phrase": "ship",
+      "normalized_class": "maritime_vessel",
+      "detector_class": "ship",
+      "detector_supported": true,
+      "notes": "Directly supported closed-set category across offshore and harbor domains."
+    },
+    {
+      "phrase": "ships docked near pier",
+      "normalized_class": "maritime_vessel",
+      "detector_class": "ship",
+      "detector_supported": true,
+      "notes": "Supported; benefits from harbor ROI constraint."
+    },
+    {
+      "phrase": "cargo vessels",
+      "normalized_class": "maritime_vessel",
+      "detector_class": "ship",
+      "detector_supported": true,
+      "notes": "Normalized to maritime_vessel -> ship."
+    },
+    {
+      "phrase": "boats",
+      "normalized_class": "maritime_vessel",
+      "detector_class": "ship",
+      "detector_supported": true,
+      "notes": "Small boats mapped to ship class with lower detection threshold."
+    },
+    {
+      "phrase": "cars",
+      "normalized_class": "ground_vehicle",
+      "detector_class": "vehicle",
+      "detector_supported": true,
+      "notes": "Directly supported in VHR sub-meter imagery."
+    },
+    {
+      "phrase": "vehicles in parking lot",
+      "normalized_class": "ground_vehicle",
+      "detector_class": "vehicle",
+      "detector_supported": true,
+      "notes": "Supported with tiling enabled to resolve dense small targets."
+    },
+    {
+      "phrase": "trucks",
+      "normalized_class": "ground_vehicle",
+      "detector_class": "vehicle",
+      "detector_supported": true,
+      "notes": "Normalized to ground_vehicle -> vehicle."
+    },
+    {
+      "phrase": "storage tanks",
+      "normalized_class": "industrial_facility",
+      "detector_class": "storage_tank",
+      "detector_supported": true,
+      "notes": "Cylindrical oil/fuel tanks with distinct circular signatures."
+    },
+    {
+      "phrase": "fuel containers",
+      "normalized_class": "industrial_facility",
+      "detector_class": "storage_tank",
+      "detector_supported": true,
+      "notes": "Normalized to industrial storage tank."
+    },
+    {
+      "phrase": "harbor cranes",
+      "normalized_class": "port_infrastructure",
+      "detector_class": "harbor_crane",
+      "detector_supported": true,
+      "notes": "Supported when specialized port detector weights are configured."
+    },
+    {
+      "phrase": "bridges",
+      "normalized_class": "transportation_infrastructure",
+      "detector_class": "bridge",
+      "detector_supported": true,
+      "notes": "Supported for linear span detection."
+    },
+    {
+      "phrase": "buildings",
+      "normalized_class": "structure",
+      "detector_class": "building",
+      "detector_supported": true,
+      "notes": "Supported; dense urban footprints require tiled NMS."
+    },
+    {
+      "phrase": "tennis courts",
+      "normalized_class": "sports_field",
+      "detector_class": "tennis_court",
+      "detector_supported": true,
+      "notes": "Supported closed-set recreational category."
+    },
+    {
+      "phrase": "baseball diamonds",
+      "normalized_class": "sports_field",
+      "detector_class": "baseball_diamond",
+      "detector_supported": true,
+      "notes": "Supported closed-set recreational category."
+    },
+    {
+      "phrase": "ground track field",
+      "normalized_class": "sports_field",
+      "detector_class": "ground_track_field",
+      "detector_supported": true,
+      "notes": "Supported stadium/track class."
+    },
+    {
+      "phrase": "helicopter",
+      "normalized_class": "aircraft",
+      "detector_class": "airplane",
+      "detector_supported": true,
+      "notes": "Rotorcraft mapped to aircraft category."
+    },
+    {
+      "phrase": "what is the average height of buildings?",
+      "normalized_class": "elevation_metric",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "3D/DEM metric question; cannot be answered by 2D bounding-box detector."
+    },
+    {
+      "phrase": "how many distinct land-cover types are visible?",
+      "normalized_class": "land_cover_classification",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Area/semantic segmentation task, not discrete instance detection."
+    },
+    {
+      "phrase": "what is the total area of the airport?",
+      "normalized_class": "geospatial_measurement",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Requires Geo_Measurement tool with GSD calculation."
+    },
+    {
+      "phrase": "describe the cloud coverage in the region",
+      "normalized_class": "atmospheric_condition",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Qualitative scene description routed to Image_Analyzer."
+    },
+    {
+      "phrase": "what color is the roof of the main terminal?",
+      "normalized_class": "attribute_vqa",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Visual attribute question routed to Image_Analyzer."
+    },
+    {
+      "phrase": "are there any ships to the north of the bridge?",
+      "normalized_class": "spatial_relation",
+      "detector_class": "ship",
+      "detector_supported": true,
+      "notes": "Supported via composition: Object_Detector(ship) + Spatial_Relationship(north_of)."
+    },
+    {
+      "phrase": "water bodies and lakes",
+      "normalized_class": "hydrology",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Continuous geographical feature; requires segmentation or land cover."
+    },
+    {
+      "phrase": "runway orientation angle",
+      "normalized_class": "oriented_geometry",
+      "detector_class": null,
+      "detector_supported": false,
+      "notes": "Requires OBB_Detector in Phase 4."
+    }
+  ]
+}

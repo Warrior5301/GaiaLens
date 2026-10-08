@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "Reference to derived data artifacts stored externally to keep agent state lightweight.",
+      "properties": {
+        "artifact_id": {
+          "description": "Unique derived artifact identifier",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_type": {
+          "description": "Class of artifact stored",
+          "enum": [
+            "image",
+            "crop",
+            "roi",
+            "detection_set",
+            "obb_set",
+            "segmentation_mask",
+            "polygon",
+            "measurement",
+            "spatial_relation",
+            "ocr_result",
+            "aligned_asset",
+            "fusion_feature",
+            "change_map"
+          ],
+          "title": "Artifact Type",
+          "type": "string"
+        },
+        "uri": {
+          "description": "Storage URI or relative artifact path",
+          "title": "Uri",
+          "type": "string"
+        },
+        "source_asset_ids": {
+          "description": "IDs of source assets that contributed to this artifact",
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Asset Ids",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary artifact metadata properties",
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "artifact_type",
+        "uri"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "EvidenceType": {
+      "description": "Functional classification of evidence items.",
+      "enum": [
+        "caption",
+        "detection",
+        "obb_detection",
+        "grounding",
+        "count",
+        "measurement",
+        "spatial_relation",
+        "ocr",
+        "fusion",
+        "qualitative_observation"
+      ],
+      "title": "EvidenceType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Traceable unit of factual evidence produced by deterministic or perception tools.",
+  "properties": {
+    "evidence_id": {
+      "description": "Unique evidence identifier cited in claims",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "evidence_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EvidenceType"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Functional type of the evidence",
+      "title": "Evidence Type"
+    },
+    "source_tool": {
+      "description": "Name of the originating tool (e.g. Object_Detector, Geo_Measurement)",
+      "title": "Source Tool",
+      "type": "string"
+    },
+    "source_tool_version": {
+      "default": "0.1.0",
+      "description": "Semantic version of the originating tool contract",
+      "title": "Source Tool Version",
+      "type": "string"
+    },
+    "asset_id": {
+      "description": "Identifier of asset to which this evidence applies",
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "payload": {
+      "additionalProperties": true,
+      "description": "Structured factual findings extracted by the tool",
+      "title": "Payload",
+      "type": "object"
+    },
+    "confidence": {
+      "description": "Confidence associated with this piece of evidence",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "artifact_refs": {
+      "description": "Derived artifacts supporting this evidence",
+      "items": {
+        "$ref": "#/$defs/ArtifactRef"
+      },
+      "title": "Artifact Refs",
+      "type": "array"
+    }
+  },
+  "required": [
+    "evidence_type",
+    "source_tool",
+    "asset_id",
+    "confidence"
+  ],
+  "title": "Evidence",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/evidence.schema.json",
+  "x-schema-version": "0.1.1"
+}

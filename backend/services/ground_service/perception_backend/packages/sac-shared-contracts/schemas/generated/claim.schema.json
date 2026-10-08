@@ -1,0 +1,57 @@
+{
+  "additionalProperties": false,
+  "description": "Atomic verifiable factual statement made in the final synthesized answer.",
+  "properties": {
+    "claim_id": {
+      "description": "Unique claim identifier (e.g. 'c1')",
+      "title": "Claim Id",
+      "type": "string"
+    },
+    "text": {
+      "description": "Textual representation of the claim",
+      "title": "Text",
+      "type": "string"
+    },
+    "claim_type": {
+      "description": "Type classification: count, existence, localization, measurement, spatial_relation, attribute",
+      "title": "Claim Type",
+      "type": "string"
+    },
+    "value": {
+      "default": null,
+      "description": "Extracted numerical or categorical value for deterministic verification",
+      "title": "Value"
+    },
+    "unit": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Unit of measurement if applicable (e.g. 'm2', 'km', 'pixels')",
+      "title": "Unit"
+    },
+    "supported_by": {
+      "description": "List of evidence IDs justifying this claim",
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported By",
+      "type": "array"
+    }
+  },
+  "required": [
+    "claim_id",
+    "text",
+    "claim_type"
+  ],
+  "title": "Claim",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/claim.schema.json",
+  "x-schema-version": "0.1.1"
+}

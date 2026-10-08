@@ -1,0 +1,175 @@
+{
+  "$defs": {
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "CoordinateFrame": {
+      "description": "Coordinate reference frames supported across SAC GeoAI.",
+      "enum": [
+        "pixel",
+        "normalized",
+        "geographic",
+        "projected"
+      ],
+      "title": "CoordinateFrame",
+      "type": "string"
+    },
+    "PointPx": {
+      "additionalProperties": false,
+      "description": "2D point in canonical image pixel coordinates (origin: top-left, x: right, y: down).",
+      "properties": {
+        "x": {
+          "description": "Horizontal pixel coordinate (columns from left edge)",
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "description": "Vertical pixel coordinate (rows from top edge)",
+          "title": "Y",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "PointPx",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical Region of Interest defining a focused spatial scope within an asset.",
+  "properties": {
+    "roi_id": {
+      "description": "Unique ROI identifier",
+      "title": "Roi Id",
+      "type": "string"
+    },
+    "source_asset_id": {
+      "description": "Originating asset ID",
+      "title": "Source Asset Id",
+      "type": "string"
+    },
+    "bbox_px": {
+      "$ref": "#/$defs/BBoxPx",
+      "description": "Axis-Aligned Bounding Box in canonical pixel frame"
+    },
+    "polygon": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/PointPx"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional finer polygon boundary of ROI",
+      "title": "Polygon"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Semantic rationale for ROI localization (e.g. prompt, prior detection)",
+      "title": "Reason"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Confidence"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Confidence in ROI localization accuracy"
+    },
+    "coordinate_frame": {
+      "$ref": "#/$defs/CoordinateFrame",
+      "default": "pixel",
+      "description": "Coordinate system convention (canonical: pixel)"
+    }
+  },
+  "required": [
+    "roi_id",
+    "source_asset_id",
+    "bbox_px"
+  ],
+  "title": "ROI",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/roi.schema.json",
+  "x-schema-version": "0.1.1"
+}

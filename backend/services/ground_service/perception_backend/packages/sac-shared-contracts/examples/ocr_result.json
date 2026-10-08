@@ -1,0 +1,26 @@
+{
+  "regions": [
+    {
+      "text_id": "txt_001",
+      "text": "SAC-RUNWAY-04L",
+      "bbox_px": {
+        "x_min": 120.0,
+        "y_min": 340.0,
+        "x_max": 280.0,
+        "y_max": 380.0
+      },
+      "confidence": {
+        "score": 0.96,
+        "calibrated": true,
+        "source": "crnn_ocr_engine"
+      },
+      "language": "en",
+      "rotation_deg": 12.5
+    }
+  ],
+  "full_text": "SAC-RUNWAY-04L",
+  "metadata": {
+    "engine": "Tesseract-RS",
+    "preprocessing": "bilateral_filter"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "additionalProperties": false,
+  "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+  "properties": {
+    "x_min": {
+      "description": "Left pixel coordinate",
+      "title": "X Min",
+      "type": "number"
+    },
+    "y_min": {
+      "description": "Top pixel coordinate",
+      "title": "Y Min",
+      "type": "number"
+    },
+    "x_max": {
+      "description": "Right pixel coordinate",
+      "title": "X Max",
+      "type": "number"
+    },
+    "y_max": {
+      "description": "Bottom pixel coordinate",
+      "title": "Y Max",
+      "type": "number"
+    }
+  },
+  "required": [
+    "x_min",
+    "y_min",
+    "x_max",
+    "y_max"
+  ],
+  "title": "BBoxPx",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/bbox_px.schema.json",
+  "x-schema-version": "0.1.1"
+}

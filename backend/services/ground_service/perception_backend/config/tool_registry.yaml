@@ -1,0 +1,125 @@
+tools:
+  Image_Analyzer:
+    version: "1.0.0"
+    category: "perception"
+    description: "Semantic remote-sensing VLM for captioning, qualitative VQA, and scene understanding"
+    capabilities:
+      - captioning
+      - vqa
+      - binary_vqa
+      - semantic_vqa
+      - scene_understanding
+    input_schema: "schemas/image_analyzer.input.schema.json"
+    output_schema: "schemas/image_analyzer.output.schema.json"
+    implementation:
+      module: "app.tools.image_analyzer.tool"
+      class: "ImageAnalyzer"
+    cost_class: "high"
+    deterministic: false
+    parallelizable: true
+    supported_modalities:
+      - optical
+      - sar
+      - ir
+
+  Object_Detector:
+    version: "1.0.0"
+    category: "perception"
+    description: "Closed-set object detector for counting and AABB localization"
+    capabilities:
+      - detection
+      - counting
+      - spatial_localization
+      - numeric_vqa
+    input_schema: "schemas/object_detector.input.schema.json"
+    output_schema: "schemas/object_detector.output.schema.json"
+    implementation:
+      module: "app.tools.object_detector.tool"
+      class: "ObjectDetector"
+    cost_class: "medium"
+    deterministic: true
+    parallelizable: true
+    supported_modalities:
+      - optical
+
+  OBB_Detector:
+    version: "1.0.0"
+    category: "perception"
+    description: "Oriented bounding box detector with angle estimation"
+    capabilities:
+      - detection
+      - oriented_detection
+      - orientation
+      - counting
+      - grounding
+    input_schema: "schemas/obb_detector.input.schema.json"
+    output_schema: "schemas/obb_detector.output.schema.json"
+    implementation:
+      module: "app.tools.obb_detector.tool"
+      class: "OBBDetector"
+    cost_class: "medium"
+    deterministic: true
+    parallelizable: true
+    supported_modalities:
+      - optical
+
+  Segmentation_Grounding:
+    version: "1.0.0"
+    category: "perception"
+    description: "Multimodal referring-expression segmentation and visual grounding"
+    capabilities:
+      - grounding
+      - segmentation
+      - spatial_localization
+    input_schema: "schemas/segmentation_grounding.input.schema.json"
+    output_schema: "schemas/segmentation_grounding.output.schema.json"
+    implementation:
+      module: "app.tools.segmentation.tool"
+      class: "SegmentationGrounding"
+    cost_class: "high"
+    deterministic: false
+    parallelizable: true
+    supported_modalities:
+      - optical
+
+  ROI_Localizer:
+    version: "0.1.1"
+    category: "perception"
+    description: "Localize image regions from a natural-language target using the shared Qwen3-VL backend"
+    capabilities:
+      - grounding
+      - region_localization
+    input_schema: "packages/sac-shared-contracts/schemas/generated/roi_localizer.input.schema.json"
+    output_schema: "packages/sac-shared-contracts/schemas/generated/roi_localizer.output.schema.json"
+    implementation:
+      module: "team_c_multimodal.roi_localizer.tool"
+      class: "ROILocalizerTool"
+    cost_class: "high"
+    deterministic: false
+    parallelizable: false
+    supported_modalities:
+      - optical
+      - sar
+      - infrared
+      - thermal
+
+  OCR_Extractor:
+    version: "0.1.1"
+    category: "semantic"
+    description: "Transcribe visible image text and ground text regions to pixel coordinates using Qwen3-VL"
+    capabilities:
+      - ocr
+      - text_grounding
+    input_schema: "packages/sac-shared-contracts/schemas/generated/ocr.input.schema.json"
+    output_schema: "packages/sac-shared-contracts/schemas/generated/ocr.output.schema.json"
+    implementation:
+      module: "team_c_multimodal.ocr_extractor.tool"
+      class: "OCRExtractorTool"
+    cost_class: "high"
+    deterministic: false
+    parallelizable: false
+    supported_modalities:
+      - optical
+      - sar
+      - infrared
+      - thermal

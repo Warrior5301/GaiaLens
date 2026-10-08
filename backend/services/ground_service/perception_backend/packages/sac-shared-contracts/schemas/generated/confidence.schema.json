@@ -1,0 +1,33 @@
+{
+  "additionalProperties": false,
+  "description": "Quantitative confidence score and calibration details.",
+  "properties": {
+    "score": {
+      "description": "Confidence score between 0.0 and 1.0",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Score",
+      "type": "number"
+    },
+    "calibrated": {
+      "default": false,
+      "description": "Whether the score represents a calibrated probability",
+      "title": "Calibrated",
+      "type": "boolean"
+    },
+    "source": {
+      "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "score",
+    "source"
+  ],
+  "title": "Confidence",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/confidence.schema.json",
+  "x-schema-version": "0.1.1"
+}

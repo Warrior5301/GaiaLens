@@ -1,0 +1,28 @@
+{
+  "call_id": "call_101",
+  "tool_name": "Object_Detector",
+  "tool_version": "0.1.0",
+  "arguments": {
+    "asset": {
+      "asset_id": "asset_spot_7",
+      "uri": "s3://satellite-imagery/spot_007.tif",
+      "modality": "optical",
+      "width_px": 2048,
+      "height_px": 2048,
+      "gsd_m": 0.5,
+      "crs": "EPSG:32632"
+    },
+    "target_classes": [
+      "airplane",
+      "storage_tank"
+    ],
+    "roi": {
+      "x_min": 100.0,
+      "y_min": 150.0,
+      "x_max": 800.0,
+      "y_max": 950.0
+    },
+    "confidence_threshold": 0.4
+  },
+  "depends_on": []
+}

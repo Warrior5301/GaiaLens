@@ -1,0 +1,48 @@
+{
+  "additionalProperties": false,
+  "description": "Geographic coordinate representation.",
+  "properties": {
+    "latitude": {
+      "description": "Latitude in decimal degrees",
+      "maximum": 90.0,
+      "minimum": -90.0,
+      "title": "Latitude",
+      "type": "number"
+    },
+    "longitude": {
+      "description": "Longitude in decimal degrees",
+      "maximum": 180.0,
+      "minimum": -180.0,
+      "title": "Longitude",
+      "type": "number"
+    },
+    "altitude_m": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional altitude above sea level in meters",
+      "title": "Altitude M"
+    },
+    "crs": {
+      "default": "EPSG:4326",
+      "description": "Coordinate Reference System identifier",
+      "title": "Crs",
+      "type": "string"
+    }
+  },
+  "required": [
+    "latitude",
+    "longitude"
+  ],
+  "title": "GeoPoint",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/geo_point.schema.json",
+  "x-schema-version": "0.1.1"
+}

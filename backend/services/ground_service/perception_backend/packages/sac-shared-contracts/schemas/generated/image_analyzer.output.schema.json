@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Output contract from Image_Analyzer tool.",
+  "properties": {
+    "task_type": {
+      "description": "Task executed",
+      "enum": [
+        "caption",
+        "vqa",
+        "scene_understanding"
+      ],
+      "title": "Task Type",
+      "type": "string"
+    },
+    "answer": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Normalized answer for VQA",
+      "title": "Answer"
+    },
+    "caption": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Descriptive caption",
+      "title": "Caption"
+    },
+    "observations": {
+      "description": "Extracted qualitative scene observations",
+      "items": {
+        "type": "string"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Confidence"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Confidence assessment"
+    },
+    "raw_text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Raw model generation text",
+      "title": "Raw Text"
+    },
+    "model_metadata": {
+      "additionalProperties": true,
+      "description": "Model metadata",
+      "title": "Model Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "task_type"
+  ],
+  "title": "ImageAnalyzerOutput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/image_analyzer.output.schema.json",
+  "x-schema-version": "0.1.1"
+}

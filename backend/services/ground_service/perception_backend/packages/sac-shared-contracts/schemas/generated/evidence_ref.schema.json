@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "Reference pointer to a factual evidence record.",
+  "properties": {
+    "evidence_id": {
+      "description": "Unique evidence identifier",
+      "title": "Evidence Id",
+      "type": "string"
+    },
+    "source_tool": {
+      "description": "Tool that produced this evidence item",
+      "title": "Source Tool",
+      "type": "string"
+    },
+    "confidence": {
+      "description": "Confidence associated with this evidence",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "uri": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional URI to underlying evidence payload",
+      "title": "Uri"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "source_tool",
+    "confidence"
+  ],
+  "title": "EvidenceRef",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/evidence_ref.schema.json",
+  "x-schema-version": "0.1.1"
+}

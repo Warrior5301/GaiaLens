@@ -1,0 +1,52 @@
+{
+  "additionalProperties": false,
+  "description": "Diagnostic report documenting spatial coregistration accuracy.",
+  "properties": {
+    "registered": {
+      "description": "Whether coregistration succeeded within tolerance",
+      "title": "Registered",
+      "type": "boolean"
+    },
+    "residual_rmse_px": {
+      "description": "Root Mean Square Error of alignment residuals in pixels",
+      "minimum": 0.0,
+      "title": "Residual Rmse Px",
+      "type": "number"
+    },
+    "target_crs": {
+      "description": "Common output coordinate reference system (e.g. EPSG:3857)",
+      "title": "Target Crs",
+      "type": "string"
+    },
+    "target_resolution_m": {
+      "description": "Common output ground sample distance in meters",
+      "exclusiveMinimum": 0.0,
+      "title": "Target Resolution M",
+      "type": "number"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Alignment diagnostic observations or caveats",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "registered",
+    "residual_rmse_px",
+    "target_crs",
+    "target_resolution_m"
+  ],
+  "title": "AlignmentReport",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/alignment_report.schema.json",
+  "x-schema-version": "0.1.1"
+}

@@ -1,0 +1,103 @@
+version: "0.1.0"
+tools:
+  Image_Analyzer:
+    owner: "team_a_perception"
+    category: "perception"
+    capabilities:
+      - "visual_qa"
+      - "dense_captioning"
+      - "scene_description"
+    input_contract: "ImageAnalyzerInput"
+    output_contract: "ImageAnalyzerOutput"
+    description: "Multimodal VLM baseline for remote-sensing image understanding and visual question answering"
+
+  Object_Detector:
+    owner: "team_a_perception"
+    category: "perception"
+    capabilities:
+      - "horizontal_bounding_box"
+      - "object_counting"
+      - "class_classification"
+    input_contract: "ObjectDetectorInput"
+    output_contract: "ObjectDetectorOutput"
+    description: "Axis-aligned bounding box object detector for geospatial targets"
+
+  OBB_Detector:
+    owner: "team_a_perception"
+    category: "perception"
+    capabilities:
+      - "oriented_detection"
+      - "grounding"
+      - "counting"
+      - "heading_estimation"
+    input_contract: "OBBDetectorInput"
+    output_contract: "OBBDetectorOutput"
+    description: "Oriented bounding box detector with counter-clockwise angle convention"
+
+  Segmentation_Grounding:
+    owner: "team_a_perception"
+    category: "perception"
+    capabilities:
+      - "prompt_grounding"
+      - "instance_segmentation"
+      - "binary_mask_generation"
+    input_contract: "SegmentationGroundingInput"
+    output_contract: "SegmentationGroundingOutput"
+    description: "Open-vocabulary text or point prompted segmentation yielding mask artifacts"
+
+  Geo_Measurement:
+    owner: "team_b_geo"
+    category: "geo_spatial"
+    capabilities:
+      - "area_calculation"
+      - "perimeter_calculation"
+      - "length_measurement"
+      - "gsd_scaling"
+    input_contract: "GeoMeasurementInput"
+    output_contract: "GeoMeasurementOutput"
+    description: "Calculates metric surface area, perimeter, and lengths from raster geometries and masks"
+
+  Spatial_Relationship:
+    owner: "team_b_geo"
+    category: "geo_spatial"
+    capabilities:
+      - "topological_contains"
+      - "topological_intersects"
+      - "directional_cardinal"
+      - "euclidean_distance"
+    input_contract: "SpatialRelationshipInput"
+    output_contract: "SpatialRelationshipOutput"
+    description: "Evaluates spatial, topological, and directional relations between geometric entities"
+
+  ROI_Localizer:
+    owner: "team_c_roi_multimodal"
+    category: "roi"
+    capabilities:
+      - "text_query_localization"
+      - "subregion_proposal"
+      - "crop_generation"
+    input_contract: "ROILocalizerInput"
+    output_contract: "ROILocalizerOutput"
+    description: "Identifies coarse regions of interest from conversational queries to narrow perception focus"
+
+  SAR_Optical_Fuser:
+    owner: "team_c_roi_multimodal"
+    category: "multimodal"
+    capabilities:
+      - "sensor_coregistration"
+      - "multimodal_fusion"
+      - "alignment_reporting"
+    input_contract: "FusionInput"
+    output_contract: "FusionOutput"
+    description: "Coregisters and fuses heterogenous sensor imagery (SAR + optical) into unified artifacts"
+
+  OCR_Extractor:
+    owner: "team_c_roi_multimodal"
+    category: "ocr"
+    capabilities:
+      - "runway_text_recognition"
+      - "facility_label_reading"
+      - "multilingual_ocr"
+    input_contract: "OCRInput"
+    output_contract: "OCROutput"
+    description: "Extracts textual markings from remote sensing runways, maritime vessels, and roofs"

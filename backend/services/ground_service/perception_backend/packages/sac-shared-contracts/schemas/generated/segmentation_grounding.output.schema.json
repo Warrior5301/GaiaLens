@@ -1,0 +1,326 @@
+{
+  "$defs": {
+    "ArtifactRef": {
+      "additionalProperties": false,
+      "description": "Reference to derived data artifacts stored externally to keep agent state lightweight.",
+      "properties": {
+        "artifact_id": {
+          "description": "Unique derived artifact identifier",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "artifact_type": {
+          "description": "Class of artifact stored",
+          "enum": [
+            "image",
+            "crop",
+            "roi",
+            "detection_set",
+            "obb_set",
+            "segmentation_mask",
+            "polygon",
+            "measurement",
+            "spatial_relation",
+            "ocr_result",
+            "aligned_asset",
+            "fusion_feature",
+            "change_map"
+          ],
+          "title": "Artifact Type",
+          "type": "string"
+        },
+        "uri": {
+          "description": "Storage URI or relative artifact path",
+          "title": "Uri",
+          "type": "string"
+        },
+        "source_asset_ids": {
+          "description": "IDs of source assets that contributed to this artifact",
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Asset Ids",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Arbitrary artifact metadata properties",
+          "title": "Metadata",
+          "type": "object"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "artifact_type",
+        "uri"
+      ],
+      "title": "ArtifactRef",
+      "type": "object"
+    },
+    "BBoxPx": {
+      "additionalProperties": false,
+      "description": "Canonical 2D Axis-Aligned Bounding Box in image pixel coordinates.",
+      "properties": {
+        "x_min": {
+          "description": "Left pixel coordinate",
+          "title": "X Min",
+          "type": "number"
+        },
+        "y_min": {
+          "description": "Top pixel coordinate",
+          "title": "Y Min",
+          "type": "number"
+        },
+        "x_max": {
+          "description": "Right pixel coordinate",
+          "title": "X Max",
+          "type": "number"
+        },
+        "y_max": {
+          "description": "Bottom pixel coordinate",
+          "title": "Y Max",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_min",
+        "y_min",
+        "x_max",
+        "y_max"
+      ],
+      "title": "BBoxPx",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "description": "Quantitative confidence score and calibration details.",
+      "properties": {
+        "score": {
+          "description": "Confidence score between 0.0 and 1.0",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        },
+        "calibrated": {
+          "default": false,
+          "description": "Whether the score represents a calibrated probability",
+          "title": "Calibrated",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Origin of confidence estimate: e.g. model_logits, ensemble_vote, rule_heuristic",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "score",
+        "source"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "GroundingResult": {
+      "additionalProperties": false,
+      "description": "Grounded referent entity representing segmented and localized object.",
+      "properties": {
+        "object_id": {
+          "description": "Unique object instance identifier",
+          "title": "Object Id",
+          "type": "string"
+        },
+        "class_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Inferred object class",
+          "title": "Class Name"
+        },
+        "referring_target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Referring expression prompt",
+          "title": "Referring Target"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "description": "Grounding confidence"
+        },
+        "bbox_px": {
+          "$ref": "#/$defs/BBoxPx",
+          "description": "AABB bounding box for localization and benchmark evaluation"
+        },
+        "obb": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OBB"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Derived oriented bounding box"
+        },
+        "polygon": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Contour polygon points [[x1, y1], [x2, y2], ...]",
+          "title": "Polygon"
+        },
+        "mask_artifact": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "External artifact reference to full resolution binary mask"
+        },
+        "source_model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Model pipeline identifier",
+          "title": "Source Model"
+        },
+        "candidate_info": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Candidate diagnostics",
+          "title": "Candidate Info"
+        }
+      },
+      "required": [
+        "object_id",
+        "confidence",
+        "bbox_px"
+      ],
+      "title": "GroundingResult",
+      "type": "object"
+    },
+    "OBB": {
+      "additionalProperties": false,
+      "description": "Canonical Oriented Bounding Box representation.",
+      "properties": {
+        "cx": {
+          "description": "Center X pixel coordinate",
+          "title": "Cx",
+          "type": "number"
+        },
+        "cy": {
+          "description": "Center Y pixel coordinate",
+          "title": "Cy",
+          "type": "number"
+        },
+        "width": {
+          "description": "Width along major box axis",
+          "minimum": 0.0,
+          "title": "Width",
+          "type": "number"
+        },
+        "height": {
+          "description": "Height along minor box axis",
+          "minimum": 0.0,
+          "title": "Height",
+          "type": "number"
+        },
+        "angle_deg": {
+          "description": "Rotation angle in degrees",
+          "title": "Angle Deg",
+          "type": "number"
+        },
+        "angle_convention": {
+          "default": "ccw_from_image_x",
+          "description": "Canonical angle convention: Counter-Clockwise from image positive X-axis",
+          "title": "Angle Convention",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cx",
+        "cy",
+        "width",
+        "height",
+        "angle_deg"
+      ],
+      "title": "OBB",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Output contract from Segmentation_Grounding tool.",
+  "properties": {
+    "groundings": {
+      "description": "Resolved grounded entities",
+      "items": {
+        "$ref": "#/$defs/GroundingResult"
+      },
+      "title": "Groundings",
+      "type": "array"
+    },
+    "model_metadata": {
+      "additionalProperties": true,
+      "description": "Metadata",
+      "title": "Model Metadata",
+      "type": "object"
+    },
+    "artifacts": {
+      "description": "Derived mask artifact references",
+      "items": {
+        "$ref": "#/$defs/ArtifactRef"
+      },
+      "title": "Artifacts",
+      "type": "array"
+    }
+  },
+  "title": "SegmentationGroundingOutput",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sac.geoai.org/schemas/v0.1.1/segmentation_grounding.output.schema.json",
+  "x-schema-version": "0.1.1"
+}

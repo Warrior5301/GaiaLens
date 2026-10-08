@@ -1,0 +1,9 @@
+earthengine-api
+fastapi
+uvicorn[standard]
+requests
+ddgs
+trafilatura
+pydantic
+geoclip
+Pillow

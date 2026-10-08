@@ -1,0 +1,31 @@
+{
+  "reference_asset": {
+    "asset_id": "opt_anchor_01",
+    "uri": "s3://satellite-archive/optical/scene_01.tif",
+    "modality": "optical",
+    "width_px": 4096,
+    "height_px": 4096,
+    "gsd_m": 0.5,
+    "crs": "EPSG:3857",
+    "acquisition_time": "2026-07-01T08:15:00Z",
+    "bands": ["red", "green", "blue", "nir"]
+  },
+  "secondary_assets": [
+    {
+      "asset": {
+        "asset_id": "sar_overlay_01",
+        "uri": "s3://satellite-archive/sar/scene_01_slc.tif",
+        "modality": "sar",
+        "width_px": 2048,
+        "height_px": 2048,
+        "gsd_m": 1.0,
+        "crs": "EPSG:4326",
+        "acquisition_time": "2026-07-01T08:20:00Z",
+        "bands": ["VV", "VH"]
+      },
+      "role": "sar"
+    }
+  ],
+  "target_crs": "EPSG:3857",
+  "target_resolution_m": 0.5
+}
