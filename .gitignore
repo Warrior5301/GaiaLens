@@ -12,3 +12,5 @@
 **/.env.*
 !**/.env.example
 /backend/app/tmp/
+# Service-account credentials must be supplied outside version control.
+/backend/services/web_searching/websearch/credentials.json
