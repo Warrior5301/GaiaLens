@@ -1,132 +1,114 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
-    const rawDetectUrl = process.env.DETECT_API_URL || "https://rajputvansh4391--o2-rtdetr-api-fastapi-app.modal.run";
-    const detectApiUrl = rawDetectUrl
-        .trim()
-        .replace(/\/docs(#.*)?\/?$/, "")
-        .replace(/\/+$/, "");
+const YOLOVR_API_URL = (
+    process.env.YOLOVR_API_URL ||
+    "https://rajputvansh4391--yolovr-inference-web-app.modal.run"
+)
+    .trim()
+    .replace(/\/docs(?:#.*)?\/?$/, "")
+    .replace(/\/+$/, "");
 
+export async function POST(request: NextRequest) {
     try {
-        let base64Image = "";
-        let scoreThreshold = 0.3;
-        let prompt = "";
+        let imageBase64 = "";
+        let prompt = "objects";
 
-        const contentType = req.headers.get("content-type") || "";
-
+        const contentType = request.headers.get("content-type") || "";
         if (contentType.includes("multipart/form-data")) {
-            const formData = await req.formData();
-            const imageFile = formData.get("image");
-            const thresholdField = formData.get("score_threshold");
+            const formData = await request.formData();
+            const image = formData.get("image");
             const promptField = formData.get("prompt");
 
-            if (thresholdField) {
-                const parsed = parseFloat(thresholdField.toString());
-                if (!isNaN(parsed)) scoreThreshold = parsed;
-            }
-            if (promptField) {
-                prompt = promptField.toString();
-            }
+            if (promptField) prompt = promptField.toString().trim() || prompt;
 
-            if (imageFile instanceof Blob) {
-                const arrayBuffer = await imageFile.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                base64Image = buffer.toString("base64");
-            } else if (typeof imageFile === "string") {
-                base64Image = imageFile;
+            if (image instanceof Blob) {
+                if (image.size > 12 * 1024 * 1024) {
+                    return NextResponse.json(
+                        { error: "The image must be 12 MiB or smaller." },
+                        { status: 413 }
+                    );
+                }
+                imageBase64 = Buffer.from(await image.arrayBuffer()).toString("base64");
+            } else if (typeof image === "string") {
+                imageBase64 = image;
             }
         } else {
-            const json = await req.json();
-            base64Image = json.image || "";
-            if (json.score_threshold !== undefined) {
-                scoreThreshold = Number(json.score_threshold);
-            }
-            if (json.prompt) {
-                prompt = json.prompt;
-            }
+            const body = await request.json();
+            imageBase64 = body.image_base64 || body.image || "";
+            prompt = body.prompt?.trim() || prompt;
         }
 
-        if (!base64Image) {
+        if (!imageBase64) {
             return NextResponse.json(
-                { error: "Image data is required for detection" },
+                { error: "Image data is required for detection." },
                 { status: 400 }
             );
         }
 
-        // Clean any data URI prefix if present
-        if (base64Image.includes(",")) {
-            base64Image = base64Image.split(",")[1];
+        // Accept a base64 data URL from JSON callers as well as raw base64.
+        if (imageBase64.startsWith("data:")) {
+            const separator = imageBase64.indexOf(",");
+            if (separator < 0) {
+                return NextResponse.json(
+                    { error: "Image data URL is invalid." },
+                    { status: 400 }
+                );
+            }
+            imageBase64 = imageBase64.slice(separator + 1);
         }
 
-        // Target detection endpoint: POST /run on O2-RTDETR service
-        const targetUrl = detectApiUrl.endsWith("/run") ? detectApiUrl : `${detectApiUrl}/run`;
-
-        const detectPayload = {
-            image: base64Image,
-            score_threshold: scoreThreshold,
-        };
-
-        const res = await fetch(targetUrl, {
+        const targetUrl = YOLOVR_API_URL.endsWith("/predict")
+            ? YOLOVR_API_URL
+            : `${YOLOVR_API_URL}/predict`;
+        const upstreamResponse = await fetch(targetUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(detectPayload),
+            body: JSON.stringify({ image_base64: imageBase64, prompt }),
         });
 
-        if (!res.ok) {
-            const errorText = await res.text();
-            console.error(`[api/detect] Detection service returned ${res.status}:`, errorText);
+        const responseText = await upstreamResponse.text();
+        let data: Record<string, unknown>;
+        try {
+            data = JSON.parse(responseText) as Record<string, unknown>;
+        } catch {
+            data = { error: responseText || "YolovR returned an unreadable response." };
+        }
+
+        if (!upstreamResponse.ok) {
+            const detail = data.detail || data.error || `YolovR returned ${upstreamResponse.status}.`;
             return NextResponse.json(
-                {
-                    error: `Detection service error (${res.status})`,
-                    details: errorText,
-                    response: `⚠️ Detection service returned an error (${res.status}): ${errorText.slice(0, 200)}`,
-                },
-                { status: res.status }
+                { error: `Detection service error (${upstreamResponse.status})`, details: detail, response: String(detail) },
+                { status: upstreamResponse.status }
             );
         }
 
-        const data = await res.json();
-
-        // data format: { image: base64_annotated_png, count: number, detections: [...] }
-        const count = data.count ?? (Array.isArray(data.detections) ? data.detections.length : 0);
-        const detections = data.detections || [];
-
-        // Count occurrences per label
-        const labelCounts: Record<string, number> = {};
-        for (const det of detections) {
-            const label = det.label || "object";
-            labelCounts[label] = (labelCounts[label] || 0) + 1;
+        const resultImage = data.image_base64 || data.image;
+        if (typeof resultImage !== "string" || !resultImage) {
+            return NextResponse.json(
+                { error: "YolovR did not return an annotated image." },
+                { status: 502 }
+            );
         }
 
-        const breakdown = Object.entries(labelCounts)
-            .map(([lbl, num]) => `${num} ${lbl}${num > 1 ? "s" : ""}`)
-            .join(", ");
-
-        const summary = count > 0
-            ? `Object detection complete. Identified ${count} objects${breakdown ? ` (${breakdown})` : ""}.`
-            : "Object detection complete. No objects detected at the current confidence threshold.";
-
-        const annotatedImageUrl = data.image
-            ? (data.image.startsWith("data:") ? data.image : `data:image/png;base64,${data.image}`)
-            : null;
+        const imageUrl = resultImage.startsWith("data:")
+            ? resultImage
+            : `data:image/jpeg;base64,${resultImage}`;
 
         return NextResponse.json({
             success: true,
-            count,
-            detections,
-            image: annotatedImageUrl,
-            summary,
-            response: summary,
+            image: imageUrl,
+            prompt,
+            summary: `Detection complete for “${prompt}”. The annotated image is attached.`,
         });
-    } catch (err: any) {
-        console.error("[api/detect] Error forwarding to detection service:", err);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
         return NextResponse.json(
             {
                 error: "Detection service unreachable",
-                details: err?.message || String(err),
-                response: `⚠️ Detection service at ${detectApiUrl} is currently unreachable. Please make sure the O2-RTDETR detection endpoint is running.`,
+                details: message,
+                response: `Could not connect to the YolovR detection service: ${message}`,
             },
-            { status: 503 }
+            { status: 502 }
         );
     }
 }

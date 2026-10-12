@@ -3,7 +3,10 @@
 import { useRef, useState, useCallback, useEffect, KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
+import { sendChat, type ChatReply, type ChatImage } from "@/lib/chat";
+
 interface Message {
+    images?: ChatImage[];
     id: string;
     role: "user" | "assistant";
     content: string;
@@ -11,7 +14,7 @@ interface Message {
 }
 
 interface FloatingChatWindowProps {
-    onSend?: (message: string, history: Message[]) => Promise<string>;
+    onSend?: (message: string, history: Message[]) => Promise<ChatReply>;
     title?: string;
     selectedBBox?: { north: number; south: number; east: number; west: number } | null;
 }
@@ -132,22 +135,16 @@ export default function FloatingChatWindow({
         setMessages(prev => [...prev, userMsg]);
         setIsLoading(true);
         try {
-            let reply: string;
-            if (onSend) {
-                reply = await onSend(text, [...messages, userMsg]);
-            } else {
-                await new Promise(r => setTimeout(r, 900));
-                reply = selectedBBox
-                    ? `Analysing your selected region. Connect a Python VLM backend at /api/chat to get real analysis.`
-                    : `You asked: "${text}". Wire up your Python backend to /api/chat for AI-powered answers.`;
-            }
-            setMessages(prev => [...prev, { id: Date.now() + "r", role: "assistant", content: reply, ts: new Date() }]);
-        } catch {
-            setMessages(prev => [...prev, { id: Date.now() + "e", role: "assistant", content: "Backend error — please try again.", ts: new Date() }]);
+            // Exclude welcome/region notices; the current question is sent separately.
+            const history = messages.filter(msg => msg.id !== "0" && !msg.id.endsWith("bbox"));
+            const reply = onSend ? await onSend(text, history) : await sendChat(text, history);
+            setMessages(prev => [...prev, { id: Date.now() + "r", role: "assistant", content: reply.content, images: reply.images, ts: new Date() }]);
+        } catch (error) {
+            setMessages(prev => [...prev, { id: Date.now() + "e", role: "assistant", content: error instanceof Error ? error.message : "Unable to reach the assistant.", ts: new Date() }]);
         } finally {
             setIsLoading(false);
         }
-    }, [input, isLoading, messages, onSend, selectedBBox]);
+    }, [input, isLoading, messages, onSend]);
 
     const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
@@ -195,6 +192,13 @@ export default function FloatingChatWindow({
                                             : "bg-white/[0.06] text-white/80 border border-white/[0.07]"
                                     }`}>
                                         {msg.content}
+                                        {msg.images?.map(image => (
+                                            <a key={image.url} href={image.url} target="_blank" rel="noopener noreferrer" className="mt-2 block">
+                                                {/* Tool annotations are served by the same-origin file proxy. */}
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={image.url} alt={image.name || "Analysis result"} className="max-w-full rounded-lg" />
+                                            </a>
+                                        ))}
                                     </div>
                                 </div>
                             ))}

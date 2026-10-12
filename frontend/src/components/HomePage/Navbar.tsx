@@ -5,10 +5,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 const navLinks = [
-  { label: "Explore", href: "#explore" },
-  { label: "Capabilities", href: "#capabilities" },
-  { label: "Models", href: "#models" },
-  { label: "Docs", href: "#docs" },
+  { label: "Explore Earth", href: "/explore-earth" },
+  { label: "General Use", href: "/general-use" },
 ];
 
 export function Navbar() {
@@ -90,28 +88,32 @@ export function Navbar() {
 
           {/* CTA + Hamburger */}
           <div className="flex items-center gap-3 shrink-0">
-            <motion.a
-              href="#contact"
+            <motion.div
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              className="hidden md:inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black shadow-sm hover:bg-white/90 transition-colors duration-200"
+              className="hidden md:inline-flex rounded-full shadow-sm"
             >
-              Launch Workspace
-              <svg
-                viewBox="0 0 16 16"
-                fill="none"
-                className="h-3.5 w-3.5"
-                aria-hidden="true"
+              <Link
+                href="/general-use"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2 text-sm font-semibold text-black hover:bg-white/90 transition-colors duration-200"
               >
-                <path
-                  d="M3 8h10M9 4l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </motion.a>
+                Launch Workspace
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  className="h-3.5 w-3.5"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 8h10M9 4l4 4-4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Link>
+            </motion.div>
 
             {/* Mobile hamburger */}
             <button
@@ -160,13 +162,13 @@ export function Navbar() {
                 </Link>
               ))}
               <div className="mt-2 border-t border-white/[0.06] pt-2">
-                <a
-                  href="#contact"
+                <Link
+                  href="/general-use"
                   onClick={() => setMenuOpen(false)}
                   className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-black hover:bg-white/90 transition-colors duration-200"
                 >
-                  Book a call
-                </a>
+                  Launch Workspace
+                </Link>
               </div>
             </div>
           </motion.div>

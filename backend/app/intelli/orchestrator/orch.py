@@ -1,3 +1,9 @@
+"""Expose specialist agents as Qwen tools and assemble the top-level reasoning agent.
+
+Tool imports register names used by function_list. Model selection comes from the
+request context in intelli.common; nested agents are created when first needed.
+"""
+
 import json
 import os
 from qwen_agent.agents import Assistant
@@ -194,7 +200,7 @@ class TemporalAgentTool(BaseTool):
 class GeoAnalysisAgentTool(BaseTool):
     description = (
         "Specialist agent for geometric and geospatial calculations: centroids, polygon area/perimeter, "
-        "distance and bearing between objects, bounding box intersections, and pixel-area to m² conversion using GSD. "
+        "distance and bearing between objects, bounding box intersections, and pixel-area to mÂ² conversion using GSD. "
         "Pass all coordinates, polygons, bounding boxes and GSD values it needs inside the query."
     )
     parameters = [
@@ -287,7 +293,7 @@ You can receive an ARBITRARY number of images from the user. Your role is to und
 
 8. **`image_context`** (Single-Image):
    - Accepts a single image (`image_path`). Use it when you have no idea what an image shows or where it is.
-   - Returns four images of the same place at different zoom levels plus textual context about it. Use them to understand the image before answering or delegating to other agents.
+   - Returns nearby satellite imagery and textual location context. Use them to understand the image before answering or delegating to other agents.
 
 ### Image Paths:
 - The user message lists every input image as "Image N path: <absolute path>". Pass these exact paths to tools; never invent paths.
@@ -318,7 +324,7 @@ You can receive an ARBITRARY number of images from the user. Your role is to und
 create_orchestrator_agent = create_agent
 
 
-def run_agent(agent, user_input_prompt, image_path=None, num_images=None):
+def run_agent(agent, user_input_prompt, image_path=None, num_images=None, history=None):
     """
     Execute the master orchestrator on a prompt and optional image path(s).
 
@@ -327,7 +333,9 @@ def run_agent(agent, user_input_prompt, image_path=None, num_images=None):
     if isinstance(image_path, (list, tuple)):
         image_path = list(image_path)[:num_images]
     # Output images are returned separately (see start_conversation_with_images), not as paths in the text
-    return run_messages(agent, build_messages(user_input_prompt, image_path), list_images=False)
+    # Previous turns provide context; the current message carries fresh image paths.
+    messages = list(history or []) + build_messages(user_input_prompt, image_path)
+    return run_messages(agent, messages, list_images=False)
 
 
 run_orchestrator = run_agent

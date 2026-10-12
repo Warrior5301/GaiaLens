@@ -16,16 +16,9 @@ import {
 } from "lucide-react";
 import { AnimatedImageStack, ImageSlide } from "@/ui/animated-testimonials";
 import { cn } from "@/lib/utils";
+import { sendChat } from "@/lib/chat";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-export type VLMTaskMode = "Query" | "Caption" | "Detect";
-
-export const TASK_MODES: { mode: VLMTaskMode; placeholder: string }[] = [
-    { mode: "Query", placeholder: "Ask anything about the satellite image…" },
-    { mode: "Caption", placeholder: "Describe or caption this satellite scene…" },
-    { mode: "Detect", placeholder: "Detect objects (e.g. buildings, ships, vehicles)…" },
-];
-
 export interface ChatAttachment {
     url: string;
     alt?: string;
@@ -39,7 +32,6 @@ export interface ChatMessage {
     imageUrl?: string;
     imageUrls?: string[];
     images?: (string | ChatAttachment)[];
-    taskMode?: VLMTaskMode;
     timestamp: Date;
 }
 
@@ -48,7 +40,6 @@ interface AnalysisPageProps {
     subtitle: string;
     accentColor: string; // tailwind gradient class e.g. "from-emerald-500 to-teal-400"
     placeholder?: string;
-    showTaskModes?: boolean;
 }
 
 interface LightboxItem {
@@ -247,13 +238,6 @@ function ChatBubble({
                     ? "bg-white/10 text-white/90 rounded-tr-sm"
                     : "bg-neutral-800 text-neutral-100 rounded-tl-sm border border-white/[0.06]"
                 }`}>
-
-                {/* Task mode pill */}
-                {msg.taskMode && (
-                    <div className="mb-1.5 inline-flex items-center rounded-md bg-white/[0.08] border border-white/15 px-2 py-0.5 text-[10px] font-medium text-neutral-300">
-                        {msg.taskMode} Mode
-                    </div>
-                )}
 
                 {/* Text content */}
                 {textContent && (
@@ -501,12 +485,7 @@ export function AnalysisPage({
     subtitle,
     accentColor,
     placeholder,
-    showTaskModes = true,
 }: AnalysisPageProps) {
-    // ── Task Mode State (Query, Caption, Point, Detect, Segment) ─────────────
-    const [activeMode, setActiveMode] = useState<VLMTaskMode>("Query");
-
-    // ── Lightbox State ────────────────────────────────────────────────────────
     const [lightboxImage, setLightboxImage] = useState<LightboxItem | null>(null);
 
     // ── Image State ───────────────────────────────────────────────────────────
@@ -541,7 +520,6 @@ export function AnalysisPage({
         },
     ]);
     const [input, setInput] = useState("");
-    const [sessionId, setSessionId] = useState<string | null>(null);
     const [isTyping, setIsTyping] = useState(false);
     const [pendingChatImage, setPendingChatImage] = useState<{ src: string; name: string; file: File } | null>(null);
     const chatFileInputRef = useRef<HTMLInputElement>(null);
@@ -679,6 +657,7 @@ export function AnalysisPage({
         if (!src) return null;
         try {
             const res = await fetch(src);
+            if (!res.ok) throw new Error("Image download failed");
             const blob = await res.blob();
             return new File([blob], filename, { type: blob.type || "image/png" });
         } catch (err) {
@@ -691,176 +670,49 @@ export function AnalysisPage({
     const sendMessage = useCallback(async () => {
         const text = input.trim();
         const attachedImg = pendingChatImage;
-        const currentWorkspaceImage = images[activeIndex];
-
-        if (!text && !attachedImg && !currentWorkspaceImage) return;
+        if (isTyping || (!text && !attachedImg && !images.length)) return;
 
         setInput("");
         setPendingChatImage(null);
-
-        // Add user message with optional attached image
+        const query = text || "Analyze the attached imagery.";
         const userMsg: ChatMessage = {
-            id: Date.now().toString(),
-            role: "user",
-            content: text || (activeMode === "Detect" ? "Detect objects in this image" : "Analyze this image"),
-            imageUrl: attachedImg ? attachedImg.src : undefined,
-            taskMode: showTaskModes ? activeMode : undefined,
-            timestamp: new Date(),
+            id: Date.now().toString(), role: "user", content: query,
+            imageUrl: attachedImg?.src, timestamp: new Date(),
         };
         setMessages(prev => [...prev, userMsg]);
         setIsTyping(true);
-
         try {
-            // ── Mode: Detect (calls separate detection endpoint) ───────────────
-            if (activeMode === "Detect") {
-                const targetBlob = await resolveImageBlob(
-                    attachedImg?.file,
-                    attachedImg ? attachedImg.src : currentWorkspaceImage?.src,
-                    attachedImg?.name || currentWorkspaceImage?.name || "detect_input.png"
-                );
-
-                if (!targetBlob) {
-                    const errorMsg: ChatMessage = {
-                        id: (Date.now() + 1).toString(),
-                        role: "assistant",
-                        content: "Please select an image in the workspace or attach an image to run object detection.",
-                        taskMode: "Detect",
-                        timestamp: new Date(),
-                    };
-                    setMessages(prev => [...prev, errorMsg]);
-                    setIsTyping(false);
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append("image", targetBlob);
-                formData.append("score_threshold", "0.3");
-                if (text) {
-                    formData.append("prompt", text);
-                }
-
-                const res = await fetch("/api/detect", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const data = await res.json();
-
-                if (!res.ok || data.error) {
-                    const aiMsg: ChatMessage = {
-                        id: (Date.now() + 1).toString(),
-                        role: "assistant",
-                        content: data.response || data.details || data.error || "Detection service failed.",
-                        taskMode: "Detect",
-                        timestamp: new Date(),
-                    };
-                    setMessages(prev => [...prev, aiMsg]);
-                } else {
-                    const aiMsg: ChatMessage = {
-                        id: (Date.now() + 1).toString(),
-                        role: "assistant",
-                        content: data.summary || `Object detection complete. Identified ${data.count} objects.`,
-                        imageUrl: data.image || undefined,
-                        taskMode: "Detect",
-                        timestamp: new Date(),
-                    };
-                    setMessages(prev => [...prev, aiMsg]);
-
-                    // Automatically add the annotated detection image to the workspace stack
-                    if (data.image) {
-                        const newSlide: ImageSlide = {
-                            src: data.image,
-                            name: `Detection Result (${data.count} objects)`,
-                        };
-                        setImages(prev => {
-                            const updated = [...prev, newSlide];
-                            setActiveIndex(updated.length - 1);
-                            return updated;
-                        });
-                    }
-                }
-            } else {
-                // ── Modes: Query & Caption (calls main GaiaLens chat endpoint) ───
-                const queryPrompt = activeMode === "Caption" && !text
-                    ? "Generate a comprehensive descriptive caption for this satellite scene."
-                    : (text || "Analyze this satellite imagery.");
-
-                const formData = new FormData();
-                formData.append("query", queryPrompt);
-                if (sessionId) {
-                    formData.append("session_id", sessionId);
-                }
-
-                // Add conversation history context
-                const recentHistory = messages.slice(-6).map(m => ({
-                    role: m.role,
-                    content: m.content,
-                }));
-                formData.append("history", JSON.stringify(recentHistory));
-
-                // Attach image if present
-                const targetBlob = await resolveImageBlob(
-                    attachedImg?.file,
-                    attachedImg ? attachedImg.src : currentWorkspaceImage?.src,
-                    attachedImg?.name || currentWorkspaceImage?.name || "input.png"
-                );
-
-                if (targetBlob) {
-                    formData.append("images", targetBlob);
-                }
-
-                const res = await fetch("/api/chat", {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const data = await res.json();
-
-                if (data.session_id) {
-                    setSessionId(data.session_id);
-                }
-
-                const replyText = data.response || data.details || data.error || "Analysis completed.";
-                const replyImages = Array.isArray(data.images) && data.images.length > 0
-                    ? data.images.map((im: any) => ({ url: im.url, name: im.name }))
-                    : undefined;
-                const primaryImageUrl = replyImages?.[0]?.url;
-
-                const aiMsg: ChatMessage = {
-                    id: (Date.now() + 1).toString(),
-                    role: "assistant",
-                    content: replyText,
-                    imageUrl: primaryImageUrl,
-                    images: replyImages,
-                    taskMode: showTaskModes ? activeMode : undefined,
-                    timestamp: new Date(),
-                };
-
-                setMessages(prev => [...prev, aiMsg]);
-
-                // If backend produced a new file image, also make it available in the workspace slides
-                if (replyImages && replyImages.length > 0) {
-                    const newSlides: ImageSlide[] = replyImages.map((im: any) => ({
-                        src: im.url,
-                        name: im.name || "AI Generated Image",
-                    }));
-                    setImages(prev => [...prev, ...newSlides]);
-                }
+            // Send the selected image first, then the rest for comparison requests.
+            const workspace = images.length
+                ? [images[activeIndex], ...images.filter((_, index) => index !== activeIndex)]
+                : [];
+            const inputs: { src: string; name: string; file?: File }[] = attachedImg ? [attachedImg, ...workspace] : workspace;
+            // Keep a chat-only attachment available for follow-up questions.
+            if (!inputs.length) {
+                const lastImage = [...messages].reverse().find(msg => msg.role === "user" && msg.imageUrl);
+                if (lastImage?.imageUrl) inputs.push({ src: lastImage.imageUrl, name: "previous-upload.png" });
             }
-        } catch (err: any) {
-            console.error("Chat error:", err);
-            const errorMsg: ChatMessage = {
-                id: (Date.now() + 1).toString(),
-                role: "assistant",
-                content: `⚠️ Failed to communicate with the analysis service: ${err?.message || "Network error"}`,
-                taskMode: showTaskModes ? activeMode : undefined,
+            const files: File[] = [];
+            for (const image of inputs) {
+                const blob = await resolveImageBlob(image.file, image.src, image.name);
+                if (!blob) throw new Error(`Could not load ${image.name || "the attached image"}. Please attach it again.`);
+                files.push(new File([blob], image.name || "satellite.png", { type: blob.type }));
+            }
+            const reply = await sendChat(query, messages.filter(msg => msg.id !== "welcome"), files);
+            setMessages(prev => [...prev, {
+                id: `${Date.now()}-reply`, role: "assistant", content: reply.content,
+                images: reply.images, timestamp: new Date(),
+            }]);
+        } catch (error) {
+            setMessages(prev => [...prev, {
+                id: `${Date.now()}-error`, role: "assistant",
+                content: error instanceof Error ? error.message : "Unable to reach the assistant.",
                 timestamp: new Date(),
-            };
-            setMessages(prev => [...prev, errorMsg]);
+            }]);
         } finally {
             setIsTyping(false);
         }
-    }, [input, pendingChatImage, images, activeIndex, activeMode, showTaskModes, sessionId, messages]);
+    }, [input, pendingChatImage, images, activeIndex, messages, isTyping]);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -1161,12 +1013,7 @@ export function AnalysisPage({
                             onKeyDown={handleKeyDown}
                             onPaste={handleChatPaste}
                             rows={1}
-                            placeholder={
-                                placeholder ??
-                                (showTaskModes
-                                    ? TASK_MODES.find(m => m.mode === activeMode)?.placeholder ?? "Ask about this satellite image…"
-                                    : "Ask about this satellite image…")
-                            }
+                            placeholder={placeholder || "Ask anything: describe, detect, compare, or measure..."}
                             className="flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/25 outline-none max-h-32 scrollbar-none leading-relaxed py-1"
                             style={{ height: "auto" }}
                             onInput={e => {
@@ -1195,29 +1042,6 @@ export function AnalysisPage({
                     </div>
 
                     {/* Mode Selector: Query | Caption | Detect */}
-                    {showTaskModes && (
-                        <div className="mt-2.5 flex items-center justify-between rounded-lg bg-[#0e131d]/90 border border-white/[0.08] p-1 shadow-inner">
-                            {TASK_MODES.map(({ mode }) => {
-                                const isActive = activeMode === mode;
-                                return (
-                                    <button
-                                        key={mode}
-                                        type="button"
-                                        onClick={() => setActiveMode(mode)}
-                                        className={cn(
-                                            "relative flex-1 py-1 text-[11px] sm:text-xs font-medium rounded-md transition-all duration-150 text-center select-none",
-                                            isActive
-                                                ? "text-white border border-white/25 bg-white/15 shadow-[0_0_10px_rgba(255,255,255,0.06)] font-semibold"
-                                                : "text-neutral-400 hover:text-white border border-transparent"
-                                        )}
-                                    >
-                                        {mode}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
-
                     <p className="mt-2 text-center text-[10px] text-white/20">Enter to send · Shift+Enter for new line · Paste image supported</p>
                 </div>
             </div>

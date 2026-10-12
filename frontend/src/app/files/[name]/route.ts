@@ -5,7 +5,7 @@ export async function GET(
     context: { params: Promise<{ name: string }> }
 ) {
     const { name } = await context.params;
-    const backendUrl = process.env.BACKEND_API_URL || "http://localhost:8000";
+    const backendUrl = process.env.BACKEND_API_URL || "http://localhost:8080";
 
     try {
         const res = await fetch(`${backendUrl}/files/${encodeURIComponent(name)}`);

@@ -1,3 +1,5 @@
+"""Shared agent entry point for the HTTP gateway, local runner, and Python callers."""
+
 import uuid
 from io import BytesIO
 from pathlib import Path
@@ -56,7 +58,7 @@ def _to_image_path(image) -> str:
     raise TypeError(f"Unsupported image type: {type(image).__name__}")
 
 
-def start_conversation(user_input: str, *images, model: str = BASE_MODEL) -> str:
+def start_conversation(user_input: str, *images, model: str = BASE_MODEL, history: list[dict] | None = None) -> str:
     """
     Pass a user query and any number of images to the orchestrator.
 
@@ -65,6 +67,7 @@ def start_conversation(user_input: str, *images, model: str = BASE_MODEL) -> str
         start_conversation("What changed between these?", "t0.png", "t1.png", "t2.png")
         start_conversation("Describe the region.")  # text only
 
+    `history` supplies validated user/assistant text turns before the current query.
     Images may be file paths, PIL Images, or raw bytes. A single list/tuple
     of images is also accepted. `model` is the model name served by vLLM (the base
     model, or a hot-loaded LoRA adapter name) used by the orchestrator and all its
@@ -83,24 +86,26 @@ def start_conversation(user_input: str, *images, model: str = BASE_MODEL) -> str
     token = current_model.set(model)
     try:
         if not image_paths:
-            return run_orchestrator(agent, user_input)
+            return run_orchestrator(agent, user_input, history=history)
 
         return run_orchestrator(
             agent,
             user_input,
             image_path=image_paths,
             num_images=len(image_paths),
+            history=history,
         )
     finally:
         current_model.reset(token)
 
 
-def start_conversation_with_images(user_input: str, *images, model: str = BASE_MODEL) -> tuple[str, list[str]]:
+def start_conversation_with_images(user_input: str, *images, model: str = BASE_MODEL, history: list[dict] | None = None) -> tuple[str, list[str]]:
     """Like start_conversation, but also returns the paths of the images that tools produced."""
+    # A request-local collection lets nested tools publish images without a global list.
     collected: list[str] = []
     token = output_images.set(collected)
     try:
-        answer = start_conversation(user_input, *images, model=model)
+        answer = start_conversation(user_input, *images, model=model, history=history)
     finally:
         output_images.reset(token)
     return answer, collected

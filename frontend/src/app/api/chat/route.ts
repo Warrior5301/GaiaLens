@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Shared gateway entry point for General Use and Explore Earth.
+// Forward multipart fields unchanged so FastAPI owns history and session handling.
 export async function POST(req: NextRequest) {
-    const backendUrl = process.env.BACKEND_API_URL || "http://localhost:8000";
+    const backendUrl = process.env.BACKEND_API_URL || "http://localhost:8080";
 
     try {
         const incomingFormData = await req.formData();

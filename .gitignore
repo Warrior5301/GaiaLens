@@ -1,0 +1,14 @@
+# Local recovery contains original source, Git metadata, and private configuration.
+/local-recovery/
+**/node_modules/
+**/.next/
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/.pytest_cache/
+**/*.tsbuildinfo
+**/next-env.d.ts
+**/.env
+**/.env.*
+!**/.env.example
+/backend/app/tmp/

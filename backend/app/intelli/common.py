@@ -24,16 +24,35 @@ def _url(name: str, port: int) -> str:
 
 # One port per service; override any of them with <NAME>_URL.
 QWEN_URL = os.getenv("QWEN_URL", "http://localhost:8000/v1")
-GROUND_URL = _url("GROUND", 8001)          # services/ground_service (object_detector, segmentation_grounding)
+GROUND_URL = os.getenv(
+    "GROUND_URL",
+    "https://rajputvansh4391--sac-geoai-perception-api.modal.run",
+)  # SAC GeoAI perception service
 SAM3_URL = _url("SAM3", 8002)              # services/poly_service
-OCR_URL = _url("OCR", 8003)                # services/ocr_service
+OCR_URL = os.getenv(
+    "OCR_URL",
+    "https://rajputvansh4391--ppocrv5-api-fastapi-app.modal.run",
+)  # PP-OCRv5 service
 MOONDREAM_URL = _url("MOONDREAM", 8004)    # services/moondream
 EARTHMIND_URL = _url("EARTHMIND", 8005)    # services/earthmind
-TERRASCOPE_URL = _url("TERRASCOPE", 8006)  # services/terrascope
-EARTHDIAL_URL = _url("EARTHDIAL", 8007)    # services/earthdial
+TERRASCOPE_URL = os.getenv(
+    "TERRASCOPE_URL",
+    "https://rajputvansh4391--terrascope-bf16-test-fastapi-app.modal.run",
+)  # TerraScope temporal comparison
+EARTHDIAL_URL = os.getenv(
+    "EARTHDIAL_URL",
+    "https://rajputvansh4391--earthdial-temporal-service-earthdialmod-24ccc1.modal.run",
+)  # EarthDial temporal comparison
 ENHANCER_URL = _url("ENHANCER", 8008)      # services/image_enhancer
 GSD_URL = _url("GSD", 8009)                # services/gsd_service
-CONTEXT_URL = _url("CONTEXT", 8010)        # multi-zoom image context endpoint
+CONTEXT_URL = os.getenv(
+    "CONTEXT_URL",
+    "https://rajputvansh4391--location-context-fastapi-fastapi-app.modal.run",
+)  # image location and nearby satellite context
+YOLOVR_URL = os.getenv(
+    "YOLOVR_URL",
+    os.getenv("YOLOVR_API_URL", "https://rajputvansh4391--yolovr-inference-web-app.modal.run"),
+).rstrip("/")  # services/yolo_serve/yolovr; accepts either a base URL or a /predict URL
 
 
 BASE_MODEL = os.getenv("QWEN_MODEL", 'Qwen/Qwen3-VL-8B-Instruct')
@@ -131,12 +150,12 @@ def ground_run(tool: str, payload: dict, timeout: int = 300) -> dict:
 
 logger = logging.getLogger("gaialens")
 
+# Local directory or HF hub ID of each LoRA adapter, set via environment variables
 LORA_PATH_ENV = {
     "Grounding": "LORA_GROUNDING_PATH",
     "VQA": "LORA_VQA_PATH",
     "Captioning": "LORA_CAPTIONING_PATH",
-    "SAR": "LORA_SAR_PATH",
-    "IR": "LORA_IR_PATH"
+    "SAR/IR": "LORA_SAR_IR_PATH",
 }
 
 

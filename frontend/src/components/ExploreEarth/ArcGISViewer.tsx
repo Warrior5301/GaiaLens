@@ -7,6 +7,7 @@ import SceneLayer from "@arcgis/core/layers/SceneLayer";
 import Sketch from "@arcgis/core/widgets/Sketch";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import "@arcgis/core/assets/esri/themes/dark/main.css";
+import { sendChat, type ChatTurn, type ChatReply } from "@/lib/chat";
 import FloatingChatWindow from "@/components/ExploreEarth/FloatingChatWindow";
 import { Compass, Mountain, Trees, SunMedium, Landmark, Waves, Satellite } from "lucide-react";
 
@@ -42,6 +43,7 @@ interface BBox {
 }
 
 interface EEImage {
+  mock?: boolean;
   url: string;
   year: number;
 }
@@ -127,42 +129,22 @@ const handleLightboxMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
 };
 
   // ── AI Assistant Chat Handler ──────────────────────────────────────────────
-  const handleChatSend = useCallback(async (message: string, history: any[]): Promise<string> => {
-    try {
-      const formData = new FormData();
-      let queryPrompt = message;
-      if (selectedBBox) {
-        queryPrompt = `[Geographic Context - BBox: South ${selectedBBox.south.toFixed(4)}, North ${selectedBBox.north.toFixed(4)}, West ${selectedBBox.west.toFixed(4)}, East ${selectedBBox.east.toFixed(4)}]\n\n${message}`;
-      }
-      formData.append("query", queryPrompt);
-
-      if (eeImages.length > 0 && eeImages[0].url) {
-        try {
-          const res = await fetch(eeImages[0].url);
-          const blob = await res.blob();
-          formData.append("images", new File([blob], `sentinel2_${eeImages[0].year}.png`, { type: "image/png" }));
-        } catch {
-          // ignore if image fetch fails
-        }
-      }
-
-      const recentTurns = history.slice(-6).map((h) => ({
-        role: h.role,
-        content: h.content,
-      }));
-      formData.append("history", JSON.stringify(recentTurns));
-
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      return data.response || data.details || data.error || "Analysis completed.";
-    } catch (err: any) {
-      console.error("Explore Earth chat error:", err);
-      return `⚠️ Unable to communicate with GaiaLens backend: ${err?.message || "Service unavailable"}`;
+  const handleChatSend = useCallback(async (message: string, history: ChatTurn[]): Promise<ChatReply> => {
+    const orderedImages = [...eeImages].filter(image => !image.mock).sort((a, b) => a.year - b.year);
+    const context: string[] = [];
+    if (selectedBBox) context.push(`Selected region: ${JSON.stringify(selectedBBox)}.`);
+    if (orderedImages.length) {
+      context.push(`Attached images in order: ${orderedImages.map((image, index) => `Image ${index + 1}: year ${image.year}`).join(", ")}.`);
+    } else {
+      context.push("No observed satellite imagery is attached. Do not infer visual findings from the selected coordinates alone.");
     }
+    const files = await Promise.all(orderedImages.map(async image => {
+      const response = await fetch(image.url);
+      if (!response.ok) throw new Error(`Could not load the ${image.year} satellite image.`);
+      const blob = await response.blob();
+      return new File([blob], `sentinel2_${image.year}.png`, { type: blob.type || "image/png" });
+    }));
+    return sendChat(`${context.join("\n")}\n\nUser question: ${message}`, history, files);
   }, [selectedBBox, eeImages]);
 
   useEffect(() => {
@@ -360,7 +342,7 @@ useEffect(() => {
     try {
       const res = await fetch("/api/earth-engine", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bbox) });
       const data = await res.json();
-      setEeImages((data.images ?? []).map((img: any) => ({ url: img.url, year: img.year })));
+      setEeImages((data.images ?? []).map((img: any) => ({ url: img.url, year: img.year, mock: Boolean(data.mock || img.mock) })));
     } catch (e) { console.error("Earth Engine fetch failed:", e); }
     finally { setEeLoading(false); }
   };
@@ -679,15 +661,6 @@ useEffect(() => {
           3D Tiles
         </button>
       </div>
-
-      <FloatingChatWindow title="GaiaLens Assistant" selectedBBox={selectedBBox}
-        onSend={async (msg, history) => {
-          try {
-            const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: msg, history, bbox: selectedBBox }) });
-            const data = await res.json();
-            return data.reply ?? "Sorry, I could not process that.";
-          } catch { return "Sorry, there was a connection error."; }
-        }} />
 
       {selectedImage && (
         <div

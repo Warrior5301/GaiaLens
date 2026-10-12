@@ -6,7 +6,6 @@ export default function GeneralUsePage() {
             title="General Use"
             subtitle="Open-ended satellite image analysis & Q&A"
             accentColor="from-sky-500 to-blue-400"
-            showTaskModes={true}
         />
     );
 }

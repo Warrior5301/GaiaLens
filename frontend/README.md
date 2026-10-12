@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GaiaLens frontend
 
-## Getting Started
+The frontend is a Next.js App Router application. See the [project README](../README.md) for the architecture, environment variables, API contracts and Python setup.
 
-First, run the development server:
+## Run
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+From this directory, run `npm ci`, configure `.env.local` using `.env.example`, and run `npm run dev`. `npm run build` builds production output; `npm start` serves that output; `npm run lint` checks source.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Where to edit
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `src/app/`: page routes, server API routes, root layout and global styles.
+- `src/components/shared/AnalysisPage.tsx`: upload workspace and task/chat behavior.
+- `src/components/ExploreEarth/ArcGISViewer.tsx`: region selection and satellite imagery interaction.
+- `src/components/HomePage/`: landing page and navigation.
+- `src/ui/`, `src/lib/`, `src/types/`: reusable visuals, helpers and external-library declarations.
+- `next.config.ts`: the single active Next.js configuration.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Both General Use and Explore Earth use `src/lib/chat.ts` to send images and history to `/api/chat`, which proxies the FastAPI orchestrator gateway. General Use has one open-ended chat with no task-mode buttons. Explore Earth sends available observed imagery and geographic context without requiring exactly four images. Both chats display generated image attachments.
 
-## Learn More
+The older direct-model and Python subprocess routes remain available for compatibility but are not used by these chat components. Configure `BACKEND_API_URL` and run the gateway with its required model services.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Keep private credentials server-side. Only public browser configuration belongs in `NEXT_PUBLIC_*` variables. Local recovery copies are outside this app and ignored by Git.

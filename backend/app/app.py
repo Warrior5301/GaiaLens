@@ -1,3 +1,9 @@
+"""HTTP gateway: refine a chat request, run agents, and publish generated images.
+
+Both interactive chat experiences use this gateway.
+Session state here belongs to this Python process and is not shared across workers.
+"""
+
 import base64
 import json
 import shutil
@@ -68,28 +74,40 @@ def chat(
     except json.JSONDecodeError:
         raise HTTPException(422, "history must be a JSON list")
 
+    if history_list is not None:
+        if not isinstance(history_list, list) or any(
+            not isinstance(turn, dict)
+            or turn.get("role") not in {"user", "assistant"}
+            or not isinstance(turn.get("content"), str)
+            for turn in history_list
+        ):
+            raise HTTPException(422, "history must be a list of user/assistant text turns")
+        history_list = [{"role": turn["role"], "content": turn["content"]} for turn in history_list[-HISTORY_MAX:]]
+
     session_id = session_id or uuid.uuid4().hex
     if history_list is None:
-        history_list = HISTORY.get(session_id, [])[-HISTORY_WINDOW:] or None
+        history_list = HISTORY.get(session_id, [])[-HISTORY_MAX:] or None
 
     cleanup_tmp()
     image_bytes = [img.file.read() for img in images]
+    # Only the refiner gets an RGB preview; downstream tools keep the original bytes.
     first_b64 = _preview_base64(image_bytes[0]) if image_bytes else None
 
     try:
-        refined = refine_query(query, first_b64, history_list)
+        refined = refine_query(query, first_b64, history_list[-HISTORY_WINDOW:] if history_list else None)
     except Exception as e:
         raise HTTPException(502, f"Query refinement failed: {e}")
 
     model = load_lora(refined.get("lora", ""))
 
     try:
-        answer, image_paths = start_conversation_with_images(refined["refined_query"], *image_bytes, model=model)
+        answer, image_paths = start_conversation_with_images(refined["refined_query"], *image_bytes, model=model, history=history_list)
     except ValueError as e:
         raise HTTPException(422, str(e))
     except Exception as e:
         raise HTTPException(500, f"Orchestrator failed: {e}")
 
+    # Turn tool-local paths into names the browser can fetch through the file proxy.
     output_images = []
     for image_path in image_paths:
         name = _publish_image(image_path)
@@ -97,7 +115,7 @@ def chat(
             output_images.append({"name": name, "url": f"/files/{name}"})
             answer = answer.replace(image_path, f"/files/{name}")  # no raw server paths in the text
 
-    turns = HISTORY.setdefault(session_id, [])
+    turns = HISTORY[session_id] = list(history_list or [])
     turns += [{"role": "user", "content": query}, {"role": "assistant", "content": answer}]
     del turns[:-HISTORY_MAX]
     if len(HISTORY) > MAX_SESSIONS:
